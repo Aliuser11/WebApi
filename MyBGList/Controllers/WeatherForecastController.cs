@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+/* all controller classes must reside in the project’s root-level /Controllers/ folder and inherit from the Microsoft.AspNetCore.Mvc.Controller base class.*/
 namespace MyBGList.Controllers
 {
     [ApiController]

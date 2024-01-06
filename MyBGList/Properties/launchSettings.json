@@ -1,25 +1,27 @@
 ﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
+  "$schema": "https://json.schemastore.org/launchsettings.json", //pointing to a URL describing the schema used by the file.
+  "iisSettings": { //containing some base configuration settings for the IIS Express web server.
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:20773",
-      "sslPort": 44343
+      "applicationUrl": "http://localhost:40080",  //tu bez zmian
+      "sslPort": 40443
     }
   },
   "profiles": {
-    "MyBGList": {
+    "MyBGList": { //Testers will only use the Kestrel web server
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7010;http://localhost:5296",
+      "launchUrl": "boardgames", //Set the starting endpoint URL
+      "applicationUrl": "https://localhost:55222;http://localhost:55221", ////2.5 exercise 1. Testers can only use 55221 and 55222 TCP ports
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Staging" //Set the runtime environment to Staging
       }
-    },
+    }
     "IIS Express": {
+      //IIS Express, a lightweight version of the Internet Information Services
+      //(IIS) Web Server, available since Windows XP and Visual Studio 2012.
       "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger",

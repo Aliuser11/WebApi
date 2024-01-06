@@ -1,0 +1,15 @@
+<exercises 2.5 >
+https://github.com/Darkseal/ASP.NET-Core-Web-API
+specifics that we need to ensure:
+1. Testers can only use 55221 and 55222 TCP ports
+2. Testers will only use the Kestrel web server
+3. The web browser used to test the app should start with the JSON list of
+the BoardGames that is returned by the BoardGamesController‘s Get()
+action method
+4. Testers, just like Developers, must be allowed to access to the
+SwaggerUI page, but not to the Developer Exception Page, which
+should be unavailable for them
+5. Testers need to retrieve the following additional fields for each
+boardgame: MinPlayers and MaxPlayers, that should contain the
+number of minimum and maximum players supported by the board
+game.
