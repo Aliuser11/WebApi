@@ -13,6 +13,7 @@ namespace MyBGList.Controllers
             _logger = logger;
         }
         [HttpGet(Name = "GetBoardGames")]
+        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
         public IEnumerable<BoardGame> Get()
         {
             return new[] {

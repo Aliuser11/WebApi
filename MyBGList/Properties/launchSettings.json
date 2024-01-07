@@ -18,7 +18,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging" //Set the runtime environment to Staging
       }
-    }
+    },
     "IIS Express": {
       //IIS Express, a lightweight version of the Internet Information Services
       //(IIS) Web Server, available since Windows XP and Visual Studio 2012.

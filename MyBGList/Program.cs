@@ -1,6 +1,7 @@
 using MyBGList;
 using System;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,9 +65,9 @@ app.UseHttpsRedirection();
 app.UseCors(); //Applying CORS
 app.UseAuthorization();
 
-app.MapGet("/error", [EnableCors("AnyOrigin")] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
+app.MapGet("/error", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
 
-app.MapGet("/error/test", [EnableCors("AnyOrigin")] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
+app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
 //app.MapGet("/BoardGames", () => new[] { // we keep the controler instead of this Minimal API cose :)
 //    new BoardGame() {
