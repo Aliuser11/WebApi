@@ -69,6 +69,19 @@ app.MapGet("/error", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] ()
 
 app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
+app.MapGet("/cod/test",
+    [EnableCors("AnyOrigin")]
+    [ResponseCache(NoStore = true)] () =>
+    Results.Text("<script>" +
+            "window.alert('Your client supports JavaScript!" +
+            "\\r\\n\\r\\n" +
+            $"Server time (UTC): {DateTime.UtcNow.ToString("o")}" +
+            "\\r\\n" +
+            "Client time (UTC): ' + new Date().toISOString());" +
+            "</script>" +
+            "<noscript>Your client does not support JavaScript</noscript>",
+            "text/html"));
+
 //app.MapGet("/BoardGames", () => new[] { // we keep the controler instead of this Minimal API cose :)
 //    new BoardGame() {
 //        Id = 1,

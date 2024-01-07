@@ -1,0 +1,22 @@
+Uniform interface - guiding principles
+- Identification of resources. Each individual resource must be univocally
+identified, for example using URIs, and represented using a standard
+format (such as JSON).
+
+- Manipulation through representations. The representation sent to the
+client should contain enough info to modify or delete the resource, as
+well as adding further resources of the same kind (if the client has the
+permissions to do that).
+
+- Self-descriptive messages. The representation sent to the client should
+contain all the required info to process the received data. This can be
+done by adding relevant info using JSON (which HTTP method to use,
+which MIME type to expect, and so on), as well as using HTTP headers
+and metadata (for caching info, character set, and the likes).
+
+- Hypermedia as the Engine of Application State (HATEOAS). Clients
+should be able to interact with the application without any specific
+knowledge beyond a generic understanding of hypermedia: in other
+words, the manipulation through representation should only be handled
+(and documented) using standard, descriptive links.
+

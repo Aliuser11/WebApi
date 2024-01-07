@@ -35,3 +35,21 @@ BoardGamesController, => et up a public cache with a max-age of 60 seconds for t
 [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
 public IEnumerable<BoardGame> Get()
 // ...
+
+Aboiut intermediate caching 
+
+the term intermediate means that cached resources are
+stored in server (or services) located between the client and the server,
+instead of on the former's local drive. This leads to three important concepts:
+Each cached resource can be used to serve multiple clients. This
+means that intermediate cache is also a shared cache, since the same
+cached response can be "hit" by several HTTP requests coming from
+different peers.
+The intermediate caching server must sit between the client and the
+server, so that it can answer to each incoming call by either serving a
+cached response (without even calling the server) or forward it to the
+server (and possibly cache it for further requests).
+The whole caching mechanism is transparent to clients, to the point
+that they are mostly unable to tell if the response comes from the
+original server or from the cache (unless the owner wants to explicitly
+make them aware of that).

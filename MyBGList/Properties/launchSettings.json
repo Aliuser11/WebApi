@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "boardgames", //Set the starting endpoint URL
-      "applicationUrl": "https://localhost:55222;http://localhost:55221", ////2.5 exercise 1. Testers can only use 55221 and 55222 TCP ports
+      "applicationUrl": "https://localhost:40443;http://localhost:40080", ////2.5 exercise 1. Testers can only use 55221 and 55222 TCP ports
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Staging" //Set the runtime environment to Staging
       }
