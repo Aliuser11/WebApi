@@ -1,5 +1,6 @@
 using MyBGList;
 using System;
+using Microsoft.AspNetCore.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,21 @@ builder.Services.AddSwaggerGen(opts =>
 opts.ResolveConflictingActions(apiDesc => apiDesc.First()) /*basically telling Swagger to resolve all conflicts related
 to duplicate routing handlers by always taking the first one found (and ignoring the others).*/
 );
+
+//Implementing CORS
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(cfg => {
+        cfg.WithOrigins(builder.Configuration["AllowedOrigins"]);
+        cfg.AllowAnyHeader();
+        cfg.AllowAnyMethod();
+    });
+    options.AddPolicy(name: "AnyOrigin",
+        cfg => {
+            cfg.AllowAnyOrigin();
+            cfg.AllowAnyHeader();
+            cfg.AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -45,11 +61,12 @@ present it to the end-user*/
 UseDeveloperExceptionPage key has been previously set to false in the appsetting.json file.*/
 
 app.UseHttpsRedirection();
-
+app.UseCors(); //Applying CORS
 app.UseAuthorization();
 
-app.MapGet("/error", () => Results.Problem()); // handle app.UseExceptionHandler("/error") Using Minimal API
-app.MapGet("/error/test", () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
+app.MapGet("/error", [EnableCors("AnyOrigin")] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
+
+app.MapGet("/error/test", [EnableCors("AnyOrigin")] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
 //app.MapGet("/BoardGames", () => new[] { // we keep the controler instead of this Minimal API cose :)
 //    new BoardGame() {
@@ -69,7 +86,8 @@ app.MapGet("/error/test", () => { throw new Exception("test"); }); // we want to
 //    }
 //});
 
-app.MapControllers();
+app.MapControllers()
+    .RequireCors("AnyOrigin"); 
 
 app.Run();
 

@@ -1,0 +1,31 @@
+ASP.NET Core gives us three ways to enable CORS:
+- The CORS middleware. the simplest technique to use,
+- Endpoint routing.
+- The [EnableCors] attribute. the best practice !!!
+
+if we want the CORS middleware to be applied to the
+endpoints handled by our Controllers and Minimal APIs, as well as taken into
+account by our global authorization settings, we need to add it before any of
+them. <RequireCors() extension method>
+
+Example Endpoint routing.
+
+app.MapGet("/error", () => Results.Problem())// handle app.UseExceptionHandler("/error") Using Minimal API
+    .RequireCors("AnyOrigin"); //apply the "AnyOrigin" named policy to MinimalAPIs. using the endpoint routing method:
+
+app.MapGet("/error/test", () => { throw new Exception("test"); })// we want to produce an error to test the way its handled
+    .RequireCors("AnyOrigin");
+
+
+    Example ASP.NET Core - the [EnableCors] attribute
+    add => using Microsoft.AspNetCore.Cors;
+    <Minimal API>
+app.MapGet("/error", [EnableCors("AnyOrigin")] () =>
+Results.Problem());
+
+app.MapGet("/error/test", [EnableCors("AnyOrigin")] () =>
+{ throw new Exception("test"); });
+
+A big advantage of the [EnableCors] attribute is that it can be assigned to
+any controller and/or action method, thus allowing us to implement our
+CORS named policies in a simple and effective way.
