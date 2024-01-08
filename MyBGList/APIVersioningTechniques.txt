@@ -1,0 +1,20 @@
+common approach to API versioning :
+- URI versioning. Using a different domain or URL segment for each
+version, such as api.example.com/v1/methodName
+- QueryString versioning: A variant of URI versioning, using a GET
+parameter instead: api.example.com/methodName?api-version=1.0
+- Route versioning. Another variant of URI versioning, using a different
+route instead: api.example.com/methodName-v1
+- Media Type versioning. Using the standard Accept HTTP header to
+indicate the version. Accept: application/json;api-version=2.0
+- Header versioning. Using a custom HTTP header to indicate the
+version, such as Accept-Version: 2.0
+
+Semantic Versioning, also known as SemVer, 
+which can be summarized in the
+following way: MAJOR.MINOR.PATCH. For example, the most recent SemVer
+version (which not surprisingly adopts its own conventions) is 2.0.0. These
+numbers must be changed according to the following rules:
+- MAJOR, when we make backward-incompatible API changes;
+- MINOR, when we add functionality in a backwards compatible manner;
+- PATCH, when we make backwards compatible bug fixes.

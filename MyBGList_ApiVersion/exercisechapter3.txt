@@ -1,0 +1,43 @@
+﻿3.4.1 Cross-Origin Resource Sharing
+Create a new CORS policy that will only accepts cross-origin requests
+performed using the HTTP GET method (with any origin and header): call it
+"AnyOrigin_GetOnly" and assign it to the Minimal API method that handles
+the <ApiVersion>/cod/test route, for any API version.
+
+3.4.2 Client-side Caching
+Update the existing caching rules for the BoardGamesController's Get()
+method (API v2 only) in the following way:
+Ensure that the response will set the Cache-control HTTP header to
+private.
+Change the max-age to 120 seconds.
+Once done, switch to the API v1 and completely disable the cache by setting
+the Cache-control HTTP header to no-store.
+
+3.4.3 Code on Demand
+Create a new CodeOnDemandController (v2 only) with no constructor,
+without ILogger support, and with two action methods handling the
+following routes:
+/v2/CodeOnDemand/Test - this endpoint must return the same exact
+response of the Minimal API method that currently handles the
+<apiVersion>/cod/test route, with the same CORS and caching
+settings. Use the ContentResult return value for the action method and
+the Content() method to return the response text.
+/v2/CodeOnDemand/Test2 - this endpoint must return the same exact
+response of the Test() action method above, with the same CORS and
+caching settings. Furthermore, it also needs to accept an optional
+addMinutes GET parameter of integer type. If such parameter is present,
+it must be added to the server time before it's sent to the client, so that
+the server time (UTC) value shown by the alert window rendered by
+the script can be altered by the HTTP request.
+Both action methods must be configured to only accept the HTTP GET
+method.
+
+3.4.4 API Documentation and Versioning
+Add a new version (v3) to our API with the following requirements:
+No support for any existing Minimal API route/endpoint.
+No support for any BoardGameController route/endpoint.
+It must support the /v3/CodeOnDemand/Test2 route/endpoint only (see
+previous exercise): however, the addMinutes GET parameter must be
+renamed to minutesToAdd, without affecting version 2.
+The new version must also have its own swagger.json documentation file
+and must be shown in the SwaggerUI just like the other ones.

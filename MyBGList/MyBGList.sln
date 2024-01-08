@@ -7,11 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBGList", "MyBGList.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB938E38-0157-4C24-B517-60B834AA9784}"
 	ProjectSection(SolutionItems) = preProject
+		APIVersioningTechniques.txt = APIVersioningTechniques.txt
 		cors.txt = cors.txt
 		Exercise.txt = Exercise.txt
 		responseCache.txt = responseCache.txt
 		uniformInterface.txt = uniformInterface.txt
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBGList_ApiVersion", "..\MyBGList_ApiVersion\MyBGList_ApiVersion.csproj", "{34246F5F-668B-4246-B307-9B1B7B028DE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +26,10 @@ Global
 		{B767C482-8823-4ED5-8138-896F474694F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B767C482-8823-4ED5-8138-896F474694F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B767C482-8823-4ED5-8138-896F474694F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34246F5F-668B-4246-B307-9B1B7B028DE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34246F5F-668B-4246-B307-9B1B7B028DE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34246F5F-668B-4246-B307-9B1B7B028DE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34246F5F-668B-4246-B307-9B1B7B028DE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

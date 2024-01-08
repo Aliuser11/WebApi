@@ -7,22 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\ErrorController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
-    <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="appsettings.Staging.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="appsettings.Staging.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Asp.Versioning.Mvc" Version="6.0.0" />
-    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 

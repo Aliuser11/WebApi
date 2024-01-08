@@ -1,19 +1,11 @@
-using MyBGList;
-using System;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(opts =>
-opts.ResolveConflictingActions(apiDesc => apiDesc.First()) /*basically telling Swagger to resolve all conflicts related
-to duplicate routing handlers by always taking the first one found (and ignoring the others).*/
-);
 
 //Implementing CORS
 builder.Services.AddCors(options => {
@@ -30,19 +22,62 @@ builder.Services.AddCors(options => {
     });
 });
 
+
+builder.Services.AddApiVersioning(options => { //set up URI versioning
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+    //options.AssumeDefaultVersionWhenUnspecified = true;
+    //options.DefaultApiVersion = new ApiVersion(1, 0);
+});
+/*we can replace the UrlSegmentApiVersionReader (or combine it) with one of the other version
+readers available: QueryStringApiVersionReader, HeaderApiVersionReader, and/or MediaTypeApiVersionReader.*/
+builder.Services.AddVersionedApiExplorer(options => { //set up URI versioning
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true; 
+});
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(opts => {
+    opts.ResolveConflictingActions(apiDesc => apiDesc.First()); /*basically telling Swagger to resolve all conflicts related
+to duplicate routing handlers by always taking the first one found (and ignoring the others).*/
+    opts.SwaggerDoc(
+        "v1",
+        new OpenApiInfo { Title = "MyBGList", Version = "v1.0" });
+    opts.SwaggerDoc(
+        "v2",
+         new OpenApiInfo { Title = "MyBGList", Version = "v2.0" });
+}); //Updating the Swagger configuration
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) //will be only included if the app is run in the Development environment
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options => { //make sure that the SwaggerUI will load the above swagger.json files.
+        options.SwaggerEndpoint(
+        $"/swagger/v1/swagger.json",
+        $"MyBGList v1");
+        options.SwaggerEndpoint(
+        $"/swagger/v2/swagger.json",
+        $"MyBGList v2");
+    });
 }
 
 if (app.Configuration.GetValue<bool>("UseSwagger")) // 4. current initialization strategy to ensure that they will be used only if the UseSwagger configuration setting is set to True.
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options => {
+        options.SwaggerEndpoint(
+        $"/swagger/v1/swagger.json",
+        $"MyBGList v1");
+        options.SwaggerEndpoint(
+        $"/swagger/v2/swagger.json",
+        $"MyBGList v2");
+    });
 }
 
 if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage")) 
@@ -65,11 +100,21 @@ app.UseHttpsRedirection();
 app.UseCors(); //Applying CORS
 app.UseAuthorization();
 
-app.MapGet("/error", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
+app.MapGet("/v{version:ApiVersion}/error",
+    [ApiVersion("1.0")] //[ApiVersion] attribute
+    [ApiVersion("2.0")]
+    [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => 
+    Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
 
-app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
+app.MapGet("/v{version:ApiVersion}error/test",
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
+    [EnableCors("AnyOrigin")]
+    [ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
-app.MapGet("/cod/test",
+app.MapGet("/v{version:ApiVersion}cod/test",
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [EnableCors("AnyOrigin")]
     [ResponseCache(NoStore = true)] () =>
     Results.Text("<script>" +
@@ -107,3 +152,4 @@ app.Run();
 
 
 //131 working with data rozdzial 4
+// but first exercises from 3.4 str 127
