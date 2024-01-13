@@ -1,5 +1,6 @@
 ﻿
 from 128 page
+
 3.4.1 Cross-Origin Resource Sharing
 FIRST : Create a new CORS policy that will only accepts cross-origin requests
 performed using the HTTP GET method (with any origin and header):
@@ -9,23 +10,26 @@ SECOND: and assign it to the Minimal API method that handles the <ApiVersion>/co
 Solution: changes made in :
 => FIRST : builder.Services.AddCors(options => { options.AddPolicy(name: "AnyOrigin_GetOnly", //3.1 CORS exercise
         cfg => {
-            cfg.AllowAnyOrigin();
+            cfg.AllowAnyOrigin(); 
             cfg.AllowAnyHeader();
-            cfg.WithMethods("GET");
+            cfg.WithMethods("GET"); <- get
         });});
 => SECOND : app.MapGet("/v{version:ApiVersion}cod/test" [EnableCors("AnyOrigin_GetOnly")]
- 
 
-
+_________________________
 3.4.2 Client-side Caching
 Update the existing caching rules for the BoardGamesController's Get()
 method (API v2 only) in the following way:
-Ensure that the response will set the Cache-control HTTP header to
-private.
-Change the max-age to 120 seconds.
-Once done, switch to the API v1 and completely disable the cache by setting
-the Cache-control HTTP header to no-store.
 
+FIRST : Ensure that the response will set the Cache-control HTTP header to private.
+SECOND : Change the max-age to 120 seconds.
+THIRD : Once done, switch to the API v1 and completely disable the cache by setting the Cache-control HTTP header to no-store.
+
+Solution: changes made in :
+=> first and second(.from .Any to Client) : boardgame controller v2 :          [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 120)]
+=>  third: boardgame controller v1 :  [ResponseCache(NoStore = true)] 
+
+________________________
 3.4.3 Code on Demand
 Create a new CodeOnDemandController (v2 only) with no constructor,
 without ILogger support, and with two action methods handling the

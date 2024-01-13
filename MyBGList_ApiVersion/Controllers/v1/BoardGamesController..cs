@@ -15,10 +15,11 @@ namespace MyBGList.Controllers.v1
             _logger = logger;
         }
         [HttpGet(Name = "GetBoardGames")]
-        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+        [ResponseCache(NoStore = true)] //3.4.2 setting the Cache-control HTTP header to no-store.
         public RestDTO<BoardGame[]> Get()
         {
-            return new RestDTO<BoardGame[]> ()
+            return new RestDTO<BoardGame[]>()
             {
                 Data = new BoardGame[] {
                     new BoardGame() {
@@ -41,7 +42,7 @@ namespace MyBGList.Controllers.v1
                         MaxPlayers = 11
                     }
                 },
-                Links = new List<LinkDTO> { 
+                Links = new List<LinkDTO> {
                     new LinkDTO(
                         Url.Action(null, "BoardGames", null, Request.Scheme)!,
                         "self",

@@ -15,7 +15,8 @@ namespace MyBGList.Controllers.v2
             _logger = logger;
         }
         [HttpGet(Name = "GetBoardGames")]
-        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+        [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 120)] //3.4.2 exercise set up a private cache with a max-age of 120 seconds for that cache  response
         public RestDTO<BoardGame[]> Get()
         {
             return new RestDTO<BoardGame[]> ()
