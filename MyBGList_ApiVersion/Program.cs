@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,13 +21,19 @@ builder.Services.AddCors(options => {
             cfg.AllowAnyHeader();
             cfg.AllowAnyMethod();
     });
+    options.AddPolicy(name: "AnyOrigin_GetOnly", //3.1 CORS exercise
+        cfg => {
+            cfg.AllowAnyOrigin();
+            cfg.AllowAnyHeader();
+            cfg.WithMethods("GET");
+        });
 });
 
 
 builder.Services.AddApiVersioning(options => { //set up URI versioning
     options.ApiVersionReader = new UrlSegmentApiVersionReader();
-    //options.AssumeDefaultVersionWhenUnspecified = true;
-    //options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 /*we can replace the UrlSegmentApiVersionReader (or combine it) with one of the other version
 readers available: QueryStringApiVersionReader, HeaderApiVersionReader, and/or MediaTypeApiVersionReader.*/
@@ -48,6 +55,9 @@ to duplicate routing handlers by always taking the first one found (and ignoring
     opts.SwaggerDoc(
         "v2",
          new OpenApiInfo { Title = "MyBGList", Version = "v2.0" });
+    //opts.SwaggerDoc(
+    //"v3",
+    //new OpenApiInfo { Title = "MyBGList", Version = "v3.0" });
 }); //Updating the Swagger configuration
 
 
@@ -64,6 +74,9 @@ if (app.Environment.IsDevelopment()) //will be only included if the app is run i
         options.SwaggerEndpoint(
         $"/swagger/v2/swagger.json",
         $"MyBGList v2");
+        //options.SwaggerEndpoint(
+        //    $"/swagger/v3/swagger.json",
+        //    $"MyBGList v3");
     });
 }
 
@@ -103,7 +116,7 @@ app.UseAuthorization();
 app.MapGet("/v{version:ApiVersion}/error",
     [ApiVersion("1.0")] //[ApiVersion] attribute
     [ApiVersion("2.0")]
-    [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => 
+    [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () =>
     Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
 
 app.MapGet("/v{version:ApiVersion}error/test",
@@ -112,10 +125,11 @@ app.MapGet("/v{version:ApiVersion}error/test",
     [EnableCors("AnyOrigin")]
     [ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
-app.MapGet("/v{version:ApiVersion}cod/test",
+app.MapGet("/v{version:ApiVersion}cod/test", //3.1 exercise
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
-    [EnableCors("AnyOrigin")]
+    //[EnableCors("AnyOrigin")]   
+    [EnableCors("AnyOrigin_GetOnly")]
     [ResponseCache(NoStore = true)] () =>
     Results.Text("<script>" +
             "window.alert('Your client supports JavaScript!" +
@@ -146,6 +160,7 @@ app.MapGet("/v{version:ApiVersion}cod/test",
 //});
 
 app.MapControllers()
+    //.RequireCors("AnyOrigin"); 
     .RequireCors("AnyOrigin"); 
 
 app.Run();

@@ -1,8 +1,21 @@
-﻿3.4.1 Cross-Origin Resource Sharing
-Create a new CORS policy that will only accepts cross-origin requests
-performed using the HTTP GET method (with any origin and header): call it
-"AnyOrigin_GetOnly" and assign it to the Minimal API method that handles
-the <ApiVersion>/cod/test route, for any API version.
+﻿
+from 128 page
+3.4.1 Cross-Origin Resource Sharing
+FIRST : Create a new CORS policy that will only accepts cross-origin requests
+performed using the HTTP GET method (with any origin and header):
+call it "AnyOrigin_GetOnly" 
+SECOND: and assign it to the Minimal API method that handles the <ApiVersion>/cod/test route, for any API version.
+
+Solution: changes made in :
+=> FIRST : builder.Services.AddCors(options => { options.AddPolicy(name: "AnyOrigin_GetOnly", //3.1 CORS exercise
+        cfg => {
+            cfg.AllowAnyOrigin();
+            cfg.AllowAnyHeader();
+            cfg.WithMethods("GET");
+        });});
+=> SECOND : app.MapGet("/v{version:ApiVersion}cod/test" [EnableCors("AnyOrigin_GetOnly")]
+ 
+
 
 3.4.2 Client-side Caching
 Update the existing caching rules for the BoardGamesController's Get()
