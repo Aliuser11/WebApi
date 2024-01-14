@@ -31,30 +31,35 @@ Solution: changes made in :
 
 ________________________
 3.4.3 Code on Demand
-Create a new CodeOnDemandController (v2 only) with no constructor,
-without ILogger support, and with two action methods handling the
-following routes:
-/v2/CodeOnDemand/Test - this endpoint must return the same exact
+1) Create a new CodeOnDemandController (v2 only) with no constructor, without ILogger support,
+solution CodeOnDemandController.cs
+
+2) with two action methods handling the following routes:
+- /v2/CodeOnDemand/Test - this endpoint must return the same exact 
 response of the Minimal API method that currently handles the
 <apiVersion>/cod/test route, with the same CORS and caching
 settings. Use the ContentResult return value for the action method and
 the Content() method to return the response text.
-/v2/CodeOnDemand/Test2 - this endpoint must return the same exact
+
+- /v2/CodeOnDemand/Test2 - this endpoint must return the same exact
 response of the Test() action method above, with the same CORS and
 caching settings. Furthermore, it also needs to accept an optional
-addMinutes GET parameter of integer type. If such parameter is present,
-it must be added to the server time before it's sent to the client, so that
-the server time (UTC) value shown by the alert window rendered by
+addMinutes GET parameter of integer type. 
+If such parameter is present, it must be added to the server time before it's sent to the client, 
+so that the server time (UTC) value shown by the alert window rendered by
 the script can be altered by the HTTP request.
-Both action methods must be configured to only accept the HTTP GET
-method.
+ 
+3)Both action methods must be configured to only accept the HTTP GET method. >>???    cfg.WithMethods("GET");
 
+_______________
 3.4.4 API Documentation and Versioning
 Add a new version (v3) to our API with the following requirements:
-No support for any existing Minimal API route/endpoint.
-No support for any BoardGameController route/endpoint.
-It must support the /v3/CodeOnDemand/Test2 route/endpoint only (see
-previous exercise): however, the addMinutes GET parameter must be
+
+1) No support for any existing Minimal API route/endpoint.
+2) No support for any BoardGameController route/endpoint.
+3) It must support the /v3/CodeOnDemand/Test2 route/endpoint only (see
+previous exercise): however,
+4) the addMinutes GET parameter must be
 renamed to minutesToAdd, without affecting version 2.
-The new version must also have its own swagger.json documentation file
+5)The new version must also have its own swagger.json documentation file
 and must be shown in the SwaggerUI just like the other ones.

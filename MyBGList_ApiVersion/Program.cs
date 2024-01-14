@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,9 +54,9 @@ to duplicate routing handlers by always taking the first one found (and ignoring
     opts.SwaggerDoc(
         "v2",
          new OpenApiInfo { Title = "MyBGList", Version = "v2.0" });
-    //opts.SwaggerDoc(
-    //"v3",
-    //new OpenApiInfo { Title = "MyBGList", Version = "v3.0" });
+    opts.SwaggerDoc(
+    "v3", // 3.4.4 Add a new version (v3) to our API
+    new OpenApiInfo { Title = "MyBGList", Version = "v3.0" });
 }); //Updating the Swagger configuration
 
 
@@ -74,9 +73,9 @@ if (app.Environment.IsDevelopment()) //will be only included if the app is run i
         options.SwaggerEndpoint(
         $"/swagger/v2/swagger.json",
         $"MyBGList v2");
-        //options.SwaggerEndpoint(
-        //    $"/swagger/v3/swagger.json",
-        //    $"MyBGList v3");
+        options.SwaggerEndpoint(
+        $"/swagger/v3/swagger.json",
+        $"MyBGList v3"); // 3,4,4 v3 version must must also have its own swagger.json and be shown in the SwaggerUI just like the other ones.
     });
 }
 
@@ -116,7 +115,8 @@ app.UseAuthorization();
 app.MapGet("/v{version:ApiVersion}/error",
     [ApiVersion("1.0")] //[ApiVersion] attribute
     [ApiVersion("2.0")]
-    [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () =>
+    [EnableCors("AnyOrigin")]
+    [ResponseCache(NoStore = true)] () =>
     Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
 
 app.MapGet("/v{version:ApiVersion}error/test",
@@ -128,6 +128,7 @@ app.MapGet("/v{version:ApiVersion}error/test",
 app.MapGet("/v{version:ApiVersion}cod/test", //3.1 exercise
     [ApiVersion("1.0")]
     [ApiVersion("2.0")]
+    [ApiVersion("3.0")] // ??? 3,4,4
     //[EnableCors("AnyOrigin")]   
     [EnableCors("AnyOrigin_GetOnly")]
     [ResponseCache(NoStore = true)] () =>
@@ -167,4 +168,4 @@ app.Run();
 
 
 //131 working with data rozdzial 4
-// but first exercises from 3.4 str 127
+
