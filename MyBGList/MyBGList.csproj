@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="6.0.0" />
     <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.1.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
