@@ -15,5 +15,10 @@ the Conventions naming standards are good enough for this table.*/
 
         [Required]
         public DateTime CreatedDate { get; set; }
+
+        /*add the required navigation properties to Entities.*/
+        public BoardGame? BoardGame { get; set; }
+
+        public Domain? Domain { get; set; }
     }
 }

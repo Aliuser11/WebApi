@@ -12,7 +12,6 @@ namespace MyBGList.Models
 
         [Required]
         [MaxLength(200)]
-
         public string Name { get; set; } = null!;
 
         [Required]
@@ -20,5 +19,7 @@ namespace MyBGList.Models
 
         [Required]
         public DateTime LastModifiedDate { get; set; }
+
+        public ICollection<BoardGames_Mechanics>? BoardGames_Mechanics { get; set; }
     }
 }
