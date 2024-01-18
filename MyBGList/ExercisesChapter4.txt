@@ -1,0 +1,80 @@
+4.4.1 Additional Fields
+Add the following properties to the BoardGames entity:
+- AlternateNames (string, max length of 200, not required)
+- Designer (string, max length of 200, not required)
+- Flags (int, required)
+
+        [MaxLength(200)]
+        public string AlternateNames { get; set; } = null!;
+
+        [MaxLength(200)]
+        public string Designer { get; set; } = null!;
+
+        [Required]
+        public int Flags { get; set; }
+
+Furthermore, add the following properties to the Domains and Mechanics
+entities:
+- Notes (string, max length of 200, not required)
+- Flags (int, required)
+
+        [MaxLength(200)]
+        public string Notes { get; set; } = null!;
+
+        [Required]
+        public int Flags { get; set; }
+
+
+4.4.2 One-to-Many Relationship
+Add a new Publisher entity that will be used to list all the available board
+game publisher (one for each BoardGame). The new entity is meant to have
+the Publishers table name and the following properties:
+- Id (primary key, int, not null)
+- Name (string, max length of 200, required)
+- CreatedDate (datetime, required)
+- LastModifiedDate (datetime, required)
+
+Once done, create a One-to-Many relationship between this entity and the
+BoardGame entity adding the PublisherId property (int, required) to the
+BoardGame entity; remember to add the navigation properties to the two
+entities, as well as defining the foreign keys, cascading rules, and
+DbSet<Publisher> in the ApplicationDbContext class using Fluent API.
+
+
+
+4.4.3 Many-to-Many Relationship
+Add a new Category entity that will be used to list all the available categories
+(one or more) for each BoardGame. The new entity is meant to have the
+Categories table name and the following properties:
+- Id (primary key, int, not null)
+- Name (string, max length of 200, required)
+- CreatedDate (datetime, required)
+- LastModifiedDate (datetime, required)
+
+Once done, create a Many-to-Many relationship between this entity and the
+BoardGame entity adding a BoardGames_Categories junction entity with the
+minimum amount of required properties; remember to add the navigation
+properties to the three entities, as well as defining the foreign keys, cascading
+rules, and DbSets for the Category and the BoardGames_Categories enties in
+the ApplicationDbContext class using Fluent API.
+
+
+
+4.4.4 Creating a new Migration
+Create a new Chapter4_Exercises migration using the EF Core Migration
+tool containing all the changes performed during the previous tasks. This task
+will also check the updated Data Model for consistency, ensuring that the
+exercises have been done properly to this point.
+
+
+4.4.5 Applying the new Migration
+Apply the newly-created Chapter4_Exercises migration using the EF Core
+Migration tool; once done, inspect the MyBGList database structure to
+ensure that all the new tables and columns have been created.
+
+
+4.4.6 Reverting to a previous Migration
+Roll-back the DB schema to its previous state by applying the Initial
+migration using the EF Core Migration tool; once done, inspect the
+MyBGList database structure to ensure that all the new tables and columns
+have been removed.

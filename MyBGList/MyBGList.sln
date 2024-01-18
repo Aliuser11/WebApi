@@ -10,11 +10,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		APIVersioningTechniques.txt = APIVersioningTechniques.txt
 		cors.txt = cors.txt
 		Exercise.txt = Exercise.txt
+		ExercisesChapter4.txt = ExercisesChapter4.txt
 		responseCache.txt = responseCache.txt
 		uniformInterface.txt = uniformInterface.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBGList_ApiVersion", "..\MyBGList_ApiVersion\MyBGList_ApiVersion.csproj", "{34246F5F-668B-4246-B307-9B1B7B028DE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyBGList_ApiVersion", "..\MyBGList_ApiVersion\MyBGList_ApiVersion.csproj", "{34246F5F-668B-4246-B307-9B1B7B028DE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
