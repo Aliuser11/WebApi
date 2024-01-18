@@ -1,7 +1,7 @@
-using MyBGList;
-using System;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyBGList.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +29,11 @@ builder.Services.AddCors(options => {
             cfg.AllowAnyMethod();
     });
 });
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+options.UseSqlServer(
+builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
 var app = builder.Build();
 
@@ -106,4 +111,4 @@ app.MapControllers()
 app.Run();
 
 
-//131 working with data rozdzial 4
+//181 UserSecretsId
