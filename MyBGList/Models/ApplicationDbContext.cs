@@ -48,10 +48,18 @@ namespace MyBGList.Models
                 .HasForeignKey(f => f.BoardGameId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<BoardGames_Mechanics>()
                 .HasOne(o => o.Mechanic)
                 .WithMany(m => m.BoardGames_Mechanics)
                 .HasForeignKey(f => f.MechanicId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<BoardGame>() // add the navigation properties to the two entities, as well as defining the foreign keys, cascading rules,
+                .HasOne(x => x.Publisher)
+                .WithMany(y => y.BoardGames)
+                .HasForeignKey(f => f.PublisherId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
         }
@@ -59,6 +67,7 @@ namespace MyBGList.Models
         public DbSet<BoardGame> BoardGames => Set<BoardGame>();
         public DbSet<Domain> Domains => Set<Domain>();
         public DbSet<Mechanic> Mechanics => Set<Mechanic>();
+        public DbSet<Publisher> Publishers => Set<Publisher>(); //exercise 4.2  and DbSet<Publisher> in the ApplicationDbContext class using Fluent API.
         public DbSet<BoardGames_Domains> BoardGames_Domains => Set<BoardGames_Domains>();
         public DbSet<BoardGames_Mechanics> BoardGames_Mechanics => Set <BoardGames_Mechanics>();
     }

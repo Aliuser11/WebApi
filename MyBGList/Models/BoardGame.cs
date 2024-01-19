@@ -10,6 +10,10 @@ namespace MyBGList.Models
         [Key]/*set this field as the table's Primary Key*/
         [Required]
         public int Id { get; set; }
+
+        [Required]
+        public int PublisherId { get; set; } // adding the PublisherId property (int, required) to the BoardGame entity;
+
         [Required] //they won't accept a null-value.
         [MaxLength(200)]
         public string Name { get; set; } = null!;
@@ -48,6 +52,8 @@ namespace MyBGList.Models
         public DateTime CreatedDate { get; set; }
         [Required]
         public DateTime LastModifiedDate { get; set; }
+
+        public Publisher? Publisher { get; set; }
 
         //additional properties added:
         public ICollection<BoardGames_Domains>? BoardGames_Domains { get; set; }

@@ -35,8 +35,8 @@ the Publishers table name and the following properties:
 - LastModifiedDate (datetime, required)
 
 Once done, create a One-to-Many relationship between this entity and the
-BoardGame entity adding the PublisherId property (int, required) to the
-BoardGame entity; remember to add the navigation properties to the two
+BoardGame entity adding the PublisherId property (int, required) to the BoardGame entity;
+remember to add the navigation properties to the two
 entities, as well as defining the foreign keys, cascading rules, and
 DbSet<Publisher> in the ApplicationDbContext class using Fluent API.
 
