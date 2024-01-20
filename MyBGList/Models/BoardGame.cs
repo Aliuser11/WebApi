@@ -14,6 +14,7 @@ namespace MyBGList.Models
         [Required]
         public int PublisherId { get; set; } // adding the PublisherId property (int, required) to the BoardGame entity;
 
+
         [Required] //they won't accept a null-value.
         [MaxLength(200)]
         public string Name { get; set; } = null!;
@@ -58,5 +59,7 @@ namespace MyBGList.Models
         //additional properties added:
         public ICollection<BoardGames_Domains>? BoardGames_Domains { get; set; }
         public ICollection<BoardGames_Mechanics>? BoardGames_Mechanics { get; set; }
+        public ICollection<BoardGames_Categories>? BoardGames_Categories { get; set; }
+
     }
 }

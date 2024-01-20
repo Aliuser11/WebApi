@@ -53,11 +53,11 @@ Categories table name and the following properties:
 
 Once done, create a Many-to-Many relationship between this entity and the
 BoardGame entity adding a BoardGames_Categories junction entity with the
-minimum amount of required properties; remember to add the navigation
+minimum amount of required properties; 
+remember to add the navigation
 properties to the three entities, as well as defining the foreign keys, cascading
 rules, and DbSets for the Category and the BoardGames_Categories enties in
 the ApplicationDbContext class using Fluent API.
-
 
 
 4.4.4 Creating a new Migration
