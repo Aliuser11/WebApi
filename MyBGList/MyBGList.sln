@@ -8,11 +8,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB938E38-0157-4C24-B517-60B834AA9784}"
 	ProjectSection(SolutionItems) = preProject
 		APIVersioningTechniques.txt = APIVersioningTechniques.txt
+		ConnectionString.txt = ConnectionString.txt
 		cors.txt = cors.txt
 		dotnet.txt = dotnet.txt
 		Exercise.txt = Exercise.txt
 		ExercisesChapter4.txt = ExercisesChapter4.txt
 		responseCache.txt = responseCache.txt
+		TextFile1.txt = TextFile1.txt
 		uniformInterface.txt = uniformInterface.txt
 	EndProjectSection
 EndProject

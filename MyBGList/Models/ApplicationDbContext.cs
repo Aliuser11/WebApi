@@ -56,30 +56,30 @@ namespace MyBGList.Models
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<BoardGame>() // add the navigation properties to the two entities, as well as defining the foreign keys, cascading rules,
-                .HasOne(x => x.Publisher)
-                .WithMany(y => y.BoardGames)
-                .HasForeignKey(f => f.PublisherId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<BoardGame>() // add the navigation properties to the two entities, as well as defining the foreign keys, cascading rules,
+            //    .HasOne(x => x.Publisher)
+            //    .WithMany(y => y.BoardGames)
+            //    .HasForeignKey(f => f.PublisherId)
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<BoardGames_Categories>()
-                .HasKey(i => new { i.BoardGameId, i.CategoryId });
+            //modelBuilder.Entity<BoardGames_Categories>()
+            //    .HasKey(i => new { i.BoardGameId, i.CategoryId });
 
-            modelBuilder.Entity<BoardGames_Categories>()
-                .HasOne(x => x.BoardGame)
-                .WithMany(y => y.BoardGames_Categories)
-                .HasForeignKey(f => f.BoardGameId) // defining the foreign keys, cascading rules
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+            //modelBuilder.Entity<BoardGames_Categories>()
+            //    .HasOne(x => x.BoardGame)
+            //    .WithMany(y => y.BoardGames_Categories)
+            //    .HasForeignKey(f => f.BoardGameId) // defining the foreign keys, cascading rules
+            //    .IsRequired()
+            //    .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<BoardGame> BoardGames => Set<BoardGame>();
         public DbSet<Domain> Domains => Set<Domain>();
         public DbSet<Mechanic> Mechanics => Set<Mechanic>();
-        public DbSet<Publisher> Publishers => Set<Publisher>(); //exercise 4.2  and DbSet<Publisher> in the ApplicationDbContext class using Fluent API.
+        //public DbSet<Publisher> Publishers => Set<Publisher>(); //exercise 4.2  and DbSet<Publisher> in the ApplicationDbContext class using Fluent API.
         public DbSet<BoardGames_Domains> BoardGames_Domains => Set<BoardGames_Domains>();
         public DbSet<BoardGames_Mechanics> BoardGames_Mechanics => Set <BoardGames_Mechanics>();
-        public DbSet<BoardGames_Categories> BoardGames_Categories => Set <BoardGames_Categories>(); //bSets for the Category and the BoardGames_Categories enties in the ApplicationDbContext class using Fluent API.
+        //public DbSet<BoardGames_Categories> BoardGames_Categories => Set <BoardGames_Categories>(); //bSets for the Category and the BoardGames_Categories enties in the ApplicationDbContext class using Fluent API.
     }
 }

@@ -13,10 +13,11 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "boardgames", //Set the starting endpoint URL
+      //"launchUrl": "boardgames", //Set the starting endpoint URL
+      "launchUrl": "swagger", //Set the starting endpoint URL
       "applicationUrl": "https://localhost:40443;http://localhost:40080", ////2.5 exercise 1. Testers can only use 55221 and 55222 TCP ports
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Staging" //Set the runtime environment to Staging
+        "ASPNETCORE_ENVIRONMENT": "Development" //Set the runtime environment to Staging
       }
     },
     "IIS Express": {

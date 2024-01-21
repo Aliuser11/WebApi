@@ -31,9 +31,9 @@ builder.Services.AddCors(options => {
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(
-builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
 
 var app = builder.Build();
 
@@ -44,11 +44,11 @@ if (app.Environment.IsDevelopment()) //will be only included if the app is run i
     app.UseSwaggerUI();
 }
 
-if (app.Configuration.GetValue<bool>("UseSwagger")) // 4. current initialization strategy to ensure that they will be used only if the UseSwagger configuration setting is set to True.
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Configuration.GetValue<bool>("UseSwagger")) // 4. current initialization strategy to ensure that they will be used only if the UseSwagger configuration setting is set to True.
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage")) 
     app.UseDeveloperExceptionPage(); /* the /error string parameter, meaning that we want to handle these errors with a
@@ -70,6 +70,9 @@ app.UseHttpsRedirection();
 app.UseCors(); //Applying CORS
 app.UseAuthorization();
 
+
+
+/*MINIMAL  A P I   */
 app.MapGet("/error", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
 
 app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
@@ -110,6 +113,4 @@ app.MapControllers()
 
 app.Run();
 
-
-//181 UserSecretsId
-//185 crud 5 chapter;
+//195 crud 5 chapter;
