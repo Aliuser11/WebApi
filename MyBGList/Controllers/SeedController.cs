@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MyBGList.Models;
 using MyBGList.Models.Csv;
 using System.Globalization;
-//214
 
 namespace MyBGList.Controllers
 {

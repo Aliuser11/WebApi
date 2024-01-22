@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Remove="Controllers\ErrorController.cs" />
     <Compile Remove="Controllers\WeatherForecastController.cs" />
+    <Compile Remove="DTO\BoardGameDTOcs.cs" />
     <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 

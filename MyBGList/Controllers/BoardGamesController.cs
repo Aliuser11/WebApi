@@ -4,6 +4,8 @@ using MyBGList.DTO;
 using MyBGList.Models;
 using System.Linq.Expressions;
 using System.Linq.Dynamic.Core;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace MyBGList.Controllers
 {
@@ -138,12 +140,85 @@ namespace MyBGList.Controllers
                         Url.Action(null, "BoardGames", new {pageIndex, pageSize }, Request.Scheme)!,
                         "self",
                         "GET"),
-                    //example https://localhost:40443/BoardGames?sortColumn=Year - to retrieve the first 10 records, sorted by Year (ascending)
+                    //example https://localhost:40443/BoardGames?filterQuery=war - to retrieve thefirst 10 board games sorted by Name (ascending) with a Name containing "war".
+                }
+            };
+        }
+
+        /* POST method */
+        [HttpPost(Name = "UpdateBoardGame")]
+        [ResponseCache(NoStore =true)]
+        public async Task<RestDTO<BoardGame?>> Post(BoardGameDTO model)
+        {
+            var boardgame = await _context.BoardGames
+                            .Where(b => b.Id == model.Id)
+                            .FirstOrDefaultAsync();
+            if (boardgame != null)
+            {
+                if(!string.IsNullOrEmpty(model.Name))
+                {
+                    boardgame.Name = model.Name;
+                }
+                if(model.Year.HasValue && model.Year.Value > 0)
+                {
+                    boardgame.Year = model.Year.Value;
+                }
+                boardgame.LastModifiedDate = DateTime.Now;
+                _context.BoardGames.Update(boardgame);
+                await _context.SaveChangesAsync();
+            };
+            return new RestDTO<BoardGame?>()
+            {
+                Data = boardgame,
+                Links = new List<LinkDTO>
+                {
+                    new LinkDTO(
+                        Url.Action(null, "BoardGames",model,Request.Scheme)!,
+                        "self",
+                        "POST"),
+                }
+            };
+            /* TO DO : 
+             Fill the JSON request body with the following values to change the Name of
+            the Risk board game (Id 181) to "Risk!", and the publishing Year from 1959
+            to 1980:
+                {
+                "id": 181,
+                "name": "Risk!",
+                "year": 1980
+                }*/
+        }
+
+        /*DELETE METHOD*/
+
+        [HttpDelete(Name = "DeleteBoardGame")]
+        [ResponseCache(NoStore = true)]
+        public async Task<RestDTO<BoardGame?>> Delete(int id)
+        {
+            var boardgame = await _context.BoardGames
+                .Where(b => b.Id == id)
+                .FirstOrDefaultAsync();
+            if (boardgame != null)
+            {
+                _context.BoardGames.Remove(boardgame);
+                await _context.SaveChangesAsync();
+            };
+
+            return new RestDTO<BoardGame?>()
+            {
+                Data = boardgame,
+                Links = new List<LinkDTO>
+                {
+                    new LinkDTO(
+                        Url.Action(null, "BoardGames", id, Request.Scheme)!,
+                        "self",
+                        "DELETE"),
                 }
             };
         }
     }
 }
+
 /*Replaced the previous IEnumerable<BoardGame> return value with a
 new RestDTO<BoardGame[]> return value, since that's what we're going
 to return now.
