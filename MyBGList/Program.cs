@@ -1,3 +1,4 @@
+using MyBGList.Attributes;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,14 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opts =>
-opts.ResolveConflictingActions(apiDesc => apiDesc.First()) /*basically telling Swagger to resolve all conflicts related
+{
+    opts.ParameterFilter<SortColumnFilter>(); //using MyBGList.Attributes;
+    opts.ParameterFilter<SortOrderFilter>(); //Binding the IParameterFilters
+
+    opts.ResolveConflictingActions(apiDesc => apiDesc.First());/*basically telling Swagger to resolve all conflicts related
 to duplicate routing handlers by always taking the first one found (and ignoring the others).*/
-);
+});
+
 
 //Implementing CORS
 builder.Services.AddCors(options => {
