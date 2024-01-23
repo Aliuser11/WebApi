@@ -1,0 +1,31 @@
+5.6.1Create
+Modify the SeedController's Put() method so that it will accept an optional
+Id parameter of integer type. If such a parameter is present, the method will
+only add the board game having that given Id, thus skipping all the others;
+otherwise, it will act just like it already does.
+
+
+5.6.2 Read
+Change the BoardGamesController's Get() method's filtering behavior:
+instead of returning the board games having a Name that contains the
+filterQuery, it should return the board games having a Name that starts with
+the filterQuery.
+
+
+5.6.3 Update
+Improve the capabilities of the BoardGamesController's Post method so that
+it can be used to also update the following columns of the [BoardGames]
+table: MinPlayers, MaxPlayers, PlayTime, MinAge. It's worth noting that, to
+properly implement such a change, the BoardGameDTO type will also need to
+be updated accordingly.
+
+
+5.6.4 Delete
+Modify the BoardGamesController's Delete() method replacing the current
+id integer parameter with a new idList string parameter, which will be used
+by clients to specify a comma-separated list of Id keys instead of a single Id.
+The improved method should perform the following tasks:
+
+=> Ensure that each single id contained in the idList parameter is of an integer type.
+=> Delete all the board games matching one of the given id keys.
+=> Return a RestDTO<BoardGame[]?> JSON object containing all the deleted board games in the data array.

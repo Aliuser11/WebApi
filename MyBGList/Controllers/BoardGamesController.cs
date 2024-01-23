@@ -122,6 +122,8 @@ namespace MyBGList.Controllers
              */
             if (!string.IsNullOrEmpty(filterQuery))
                 query = query.Where(b => b.Name.Contains(filterQuery));
+            //query = query.Where(b => b.Name.StartsWith(filterQuery)); /* 5.6.2 modify get method exercise. change b.Name.Contains(filterQuery) to Name.StartsWith  filterQuery*/
+
             var recordCount = await query.CountAsync();
             query = query     
                 .OrderBy($"{sortColumn} {sortOrder}") // musi być spacja! OrderBy() extension method provided by Dynamic LINQ.
@@ -145,7 +147,7 @@ namespace MyBGList.Controllers
             };
         }
 
-        /* POST method */
+        /* POST method */ 
         [HttpPost(Name = "UpdateBoardGame")]
         [ResponseCache(NoStore =true)]
         public async Task<RestDTO<BoardGame?>> Post(BoardGameDTO model)
@@ -163,6 +165,24 @@ namespace MyBGList.Controllers
                 {
                     boardgame.Year = model.Year.Value;
                 }
+                // and 5.6.3 Update => table: MinPlayers, MaxPlayers, PlayTime, MinAge.
+                //if (model.MinPlayers.HasValue && model.MinPlayers.Value > 0)
+                //{
+                //    boardgame.MinPlayers = model.MinPlayers.Value;
+                //}
+                //if(model.MaxPlayers.HasValue && model.MaxPlayers.Value > 0)
+                //{
+                //    boardgame.MaxPlayers = model.MaxPlayers.Value;
+                //}
+                //if (model.PlayTime.HasValue && model.PlayTime.Value > 0)
+                //{
+                //    boardgame.PlayTime = model.PlayTime.Value;
+                //}
+                //if(model.MinAge.HasValue && model.MinAge.Value > 0 )
+                //{
+                //    boardgame.MinAge = model.MinAge.Value;
+                //}
+
                 boardgame.LastModifiedDate = DateTime.Now;
                 _context.BoardGames.Update(boardgame);
                 await _context.SaveChangesAsync();
@@ -195,6 +215,7 @@ namespace MyBGList.Controllers
         [ResponseCache(NoStore = true)]
         public async Task<RestDTO<BoardGame?>> Delete(int id)
         {
+
             var boardgame = await _context.BoardGames
                 .Where(b => b.Id == id)
                 .FirstOrDefaultAsync();
@@ -210,12 +231,52 @@ namespace MyBGList.Controllers
                 Links = new List<LinkDTO>
                 {
                     new LinkDTO(
+                        //Url.Action(null, "BoardGames", id, Request.Scheme)!,
                         Url.Action(null, "BoardGames", id, Request.Scheme)!,
                         "self",
                         "DELETE"),
                 }
             };
         }
+
+        ///*/ 5.exercise delete method*/
+        //[HttpDelete(Name = "DeleteBoardGame")]
+        //[ResponseCache(NoStore = true)]
+        //public async Task<RestDTO<BoardGame[]?>> Delete(string idList)
+        //{
+        //    /*idList string parameter, which will be used by clients to specify a comma-separated list of Id keys*/
+        //    var idArray = idList.Split(",").Select(x => int.Parse(x)); // each single id contained in the idList parameter is of an integer type
+        //    var deleteBG = new List<BoardGame>();
+        //    foreach (int id in idArray)
+        //    {
+        //        var boardgame = await _context.BoardGames
+        //        .Where(b => b.Id == id)
+        //        .FirstOrDefaultAsync();
+
+        //        if (boardgame != null)
+        //        {
+        //            deleteBG.Add(boardgame);  // ad to list all that was deleted 
+        //            _context.BoardGames.Remove(boardgame); ////Delete all the board games matching one of the given id keys.
+        //            await _context.SaveChangesAsync();
+        //        };
+        //    }
+
+        //    return new RestDTO<BoardGame[]?>()
+        //    {
+        //        Data = deleteBG.Count > 0 ? deleteBG.ToArray() : null, ///object containing all the deleted board games in the data array.
+        //        Links = new List<LinkDTO>
+        //            {
+        //                new LinkDTO(
+        //                        Url.Action(
+        //                            null,
+        //                            "BoardGames",
+        //                            idList,
+        //                            Request.Scheme)!,
+        //                        "self",
+        //                        "DELETE"),
+        //            }
+        //    };
+    //}
     }
 }
 
