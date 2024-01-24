@@ -8,7 +8,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(opts =>
+{
+    /*Customize the Model Binding errors*/
+    opts.ModelBindingMessageProvider.SetValueIsInvalidAccessor(
+        (x) => $"The value '{x}' is invalid");
+    opts.ModelBindingMessageProvider.SetValueMustBeANumberAccessor(
+        (x) => $"The field {x} must be a number.");
+    opts.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor(
+        (x, y) => $"The value '{x}' is not valid for {y}.");
+    opts.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(
+        () => $"A value is required.");
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opts =>
@@ -41,7 +53,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
+////Configuring the ApiController's behavior
+builder.Services.Configure< ApiBehaviorOptions > (options =>
+options.SuppressModelStateInvalidFilter = true);
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) //will be only included if the app is run in the Development environment
