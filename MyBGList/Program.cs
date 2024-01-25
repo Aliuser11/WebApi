@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyBGList.Models;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,11 +83,31 @@ if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
 
 else
 {
-    app.UseExceptionHandler("/error");/* <- handles HTTPlevel
+   // app.UseExceptionHandler("/error"); 
+    /* <- handles HTTPlevel
 exceptions, but it’s better suited for non-development
 environments since it sends all the relevant error info to a customizable
 handler instead of generating a detailed error response and automatically
 present it to the end-user*/
+
+    ////from chapter about exeptions handling:
+    app.UseExceptionHandler(action => {
+        action.Run(async context =>
+        {
+            var exceptionHandler =
+            context.Features.Get<IExceptionHandlerPathFeature>();
+            var details = new ProblemDetails();
+            details.Detail = exceptionHandler?.Error.Message;
+            details.Extensions["traceId"] =
+            System.Diagnostics.Activity.Current?.Id
+            ?? context.TraceIdentifier;
+            details.Type =
+            "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+            details.Status = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync(
+            System.Text.Json.JsonSerializer.Serialize(details)); #A
+        });
+    });
 }
 /*the ExceptionHandlerMiddleware will be used instead of the DeveloperExceptionPageMiddleware, since the value of the
 UseDeveloperExceptionPage key has been previously set to false in the appsetting.json file.*/
@@ -98,7 +119,27 @@ app.UseAuthorization();
 
 
 /*MINIMAL  A P I   */
-app.MapGet("/error", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
+app.MapGet("/error", 
+    [EnableCors("AnyOrigin")]
+    //[ResponseCache(NoStore = true)] () => Results.Problem());// handle app.UseExceptionHandler("/error") Using Minimal API
+    
+    ////from chapter 6.2.4.
+    [ResponseCache(NoStore = true)] (HttpContext context) =>
+    {
+        var exceptionHandler =
+        context.Features.Get< IExceptionHandlerPathFeature > ();
+        // TODO : logging, sending,
+        var details = new ProblemDetails();
+        details.Detail = exceptionHandler?.Error.Message;
+        details.Extensions["tradeId"] =
+            System.Diagnostics.Activity.Current?.Id
+            ?? context.TraceIdentifier;
+        details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+        details.Status = StatusCodes.Status500InternalServerError;
+        return Results.Problem(details);
+
+
+    });
 
 app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 
