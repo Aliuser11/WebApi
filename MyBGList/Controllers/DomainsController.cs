@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyBGList.Attributes;
 using MyBGList.DTO;
 using MyBGList.Models;
 using System.Linq.Dynamic.Core;
@@ -23,6 +24,7 @@ namespace MyBGList.Controllers
         /* GET */
         [HttpGet(Name = "GetDomains")]
         [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)]
+        [ManualValidationFilter]
         public async Task<ActionResult<RestDTO<Domain[]>>> Get(
 
           [FromQuery] RequestDTO<DomainDTO> input)
