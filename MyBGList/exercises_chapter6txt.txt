@@ -1,0 +1,68 @@
+6.3.1 Built-in Validators
+Add a built-in validator to the Name property of the DomainDTO object so that
+it will only be considered valid only if it's not null, not empty, and containing
+only uppercase and lowercase letters - without digits, spaces, or any other character.
+=> Examples of valid values: "Strategy", "Family", "Abstract".
+=> Examples of invalid values: "Strategy Games", "Children's",
+"101Guides", "", null.
+
+In case of an invalid value, the validator should emit the following error message:
+=> "Value must contain only letters (no spaces, digits, or other chars)"
+The DomainsController's Post method, which accepts a DomainDTO complex
+type as parameter, can be used to test the HTTP response containing the
+validation outcome.
+
+
+6.3.2 Custom Validators
+Create a [LettersOnly] validator attribute and implement it to fulfill the
+same specifications given in section 6.3.1, including the error message; the
+actual value check should be performed using either Regular Expressions or
+string manipulation techniques, depending on the custom UseRegex parameter
+being set to true or false (default).
+Once the custom validator attribute is ready, apply it to the Name property of
+the MechanicDTO object and properly test it out (using both the UseRegex
+parameter values available) using the MechanicsController's Post method.
+
+
+6.3.3 IValidatableObject
+Implement the IValidatableObject interface to the DomainDTO object and
+use its Valid method to consider the model valid only if the Id value is equal
+to 3 or if the Name value is equal to "Wargames".
+
+If the model is invalid, the validator should emit the following error message:
+=> "Id and/or Name values must match an allowed Domain."
+The DomainsController's Post method, which accepts a DomainDTO complex
+type as parameter, can be used to test the HTTP response containing the validation outcome.
+
+
+6.3.4 ModelState Validation
+Apply the [ManualValidatonFilter] attribute to the DomainsController's
+Post method to disable the automatic ModelState validation performed by
+the [ApiController]. Once done, implement a manual ModelState
+validation to conditionally return the following HTTP status codes whenever
+it's not valid:
+
+=> HTTP 403 - Forbidden - if the ModelState is invalid due to the Id
+value not being equal to 3 and the Name value not being equal to "Wargames"
+=> HTTP 400 - Bad Request - if the ModelState is invalid for any otherreason
+If the ModelState is valid, the HTTP request must be processed as normal.
+
+
+6.3.5 Exception Handling
+Modify the current /error endpoint behavior to conditionally return the
+following HTTP status code depending on the type of exception being thrown:
+=> HTTP 501 - Not Implemented - for the NotImplementedException type
+=> HTTP 504 - Gateway Timeout - for the TimeoutException type
+=> HTTP 500 - Internal Server Error - for any other exception type
+
+==> app.MapGet("/error", 
+if(exceptionHandler?.Error is NotImplementedException)
+
+To test the new error handling implementation, create two new MapGet
+methods using Minimal API:
+=> /error/test/501 for the HTTP 501 - Not Implemented statuscode
+=> /error/test/504 for the HTTP 504 - Gateway Timeout statuscode.
+And implement them so that they will throw an exception of the
+corresponding type.
+
+ { throw new NotImplementedException("test 501"); });

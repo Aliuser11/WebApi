@@ -83,7 +83,7 @@ if (app.Configuration.GetValue<bool>("UseDeveloperExceptionPage"))
 
 else
 {
-   // app.UseExceptionHandler("/error"); 
+    app.UseExceptionHandler("/error");
     /* <- handles HTTPlevel
 exceptions, but it’s better suited for non-development
 environments since it sends all the relevant error info to a customizable
@@ -91,23 +91,24 @@ handler instead of generating a detailed error response and automatically
 present it to the end-user*/
 
     ////from chapter about exeptions handling:
-    app.UseExceptionHandler(action => {
-        action.Run(async context =>
-        {
-            var exceptionHandler =
-            context.Features.Get<IExceptionHandlerPathFeature>();
-            var details = new ProblemDetails();
-            details.Detail = exceptionHandler?.Error.Message;
-            details.Extensions["traceId"] =
-            System.Diagnostics.Activity.Current?.Id
-            ?? context.TraceIdentifier;
-            details.Type =
-            "https://tools.ietf.org/html/rfc7231#section-6.6.1";
-            details.Status = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsync(
-            System.Text.Json.JsonSerializer.Serialize(details)); #A
-        });
-    });
+    //app.UseExceptionHandler(action => {
+    //    action.Run(async context =>
+    //    {
+    //        var exceptionHandler =
+    //        context.Features.Get<IExceptionHandlerPathFeature>();
+    //        var details = new ProblemDetails();
+    //        details.Detail = exceptionHandler?.Error.Message;
+    //        details.Extensions["traceId"] =
+    //        System.Diagnostics.Activity.Current?.Id
+    //        ?? context.TraceIdentifier;
+    //        details.Type =
+    //        "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+    //        details.Status = StatusCodes.Status500InternalServerError;
+    //        await context.Response.WriteAsync(
+    //        System.Text.Json.JsonSerializer.Serialize(details)); 
+    //    });
+    //});
+
 }
 /*the ExceptionHandlerMiddleware will be used instead of the DeveloperExceptionPageMiddleware, since the value of the
 UseDeveloperExceptionPage key has been previously set to false in the appsetting.json file.*/
@@ -134,12 +135,38 @@ app.MapGet("/error",
         details.Extensions["tradeId"] =
             System.Diagnostics.Activity.Current?.Id
             ?? context.TraceIdentifier;
-        details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
-        details.Status = StatusCodes.Status500InternalServerError;
+
+        /* 6.3.5 Exception Handling exercise */
+        if(exceptionHandler?.Error is NotImplementedException)
+        {
+            details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.2";
+            details.Status = StatusCodes.Status501NotImplemented;
+        }
+        else if( exceptionHandler?.Error is TimeoutException)
+        {
+            details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.5";
+            details.Status = StatusCodes.Status504GatewayTimeout;
+        }
+        else
+        {
+            details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+            details.Status = StatusCodes.Status500InternalServerError;
+        }
         return Results.Problem(details);
 
-
     });
+
+/*  6.3.5 Exception Handling exercise */
+// => /error/test/501 for the HTTP 501 - Not Implemented statuscode
+/*app.MapGet("/error/test/501", 
+    [EnableCors("AnyOrigin")]
+[ResponseCache(NoStore = true)] () => 
+    { throw new NotImplementedException("test 501"); });
+//=> /error/test/504 for the HTTP 504 - Gateway Timeout statuscode.
+app.MapGet("/error/test/504",
+    [EnableCors("AnyOrigin")]
+[ResponseCache(NoStore = true)] () =>
+    { throw new TimeoutException("test 504"); });*/
 
 app.MapGet("/error/test", [EnableCors("AnyOrigin")][ResponseCache(NoStore = true)] () => { throw new Exception("test"); }); // we want to produce an error to test the way its handled
 

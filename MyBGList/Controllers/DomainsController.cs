@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyBGList.Attributes;
 using MyBGList.DTO;
 using MyBGList.Models;
+using System.Diagnostics;
 using System.Linq.Dynamic.Core;
 
 namespace MyBGList.Controllers
@@ -83,8 +84,36 @@ namespace MyBGList.Controllers
         /* POST */
         [HttpPost(Name = "UpdateDomain")]
         [ResponseCache(NoStore = true)]
-        public async Task<RestDTO<Domain?>> Post(DomainDTO model)
+        [ManualValidationFilter] //6.3.4 ModelState Validation
+
+        public async Task<ActionResult<RestDTO<Domain?>>> Post(DomainDTO model) //ActionResult added
         {
+            /* 6.3.4. => HTTP 403 - Forbidden - if the ModelState is invalid due to the Id
+            value not being equal to 3 and the Name value not being equal to "Wargames"  */
+            if (!ModelState.IsValid)
+            {
+                /* 6.3.3 Post method, which accepts a DomainDTO complex type as parameter, can be used to test the HTTP response containing the validation outcome.*/
+                var details = new ValidationProblemDetails(ModelState);
+                details.Extensions["traceId"] =
+                        Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+                if (model.Id !=3 && model.Name != "Wargames")
+                {
+                    details.Type =
+                    "https://tools.ietf.org/html/rfc7231#section-6.5.3";
+                    details.Status = StatusCodes.Status403Forbidden;
+                    return new ObjectResult(details)
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+                }
+                else
+                {
+                    details.Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1";
+                    details.Status = StatusCodes.Status400BadRequest;
+                    return new BadRequestObjectResult(details);
+                }
+            }
+            // process as normal when model is valid 
             var domain = await _context.Domains
                             .Where(b => b.Id == model.Id)
                             .FirstOrDefaultAsync();
