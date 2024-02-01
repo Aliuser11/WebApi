@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MyBGList.DTO;
 using MyBGList.Models;
 using System.Linq.Dynamic.Core;
+using MyBGList.Constants;
 
 namespace MyBGList.Controllers
 {
@@ -159,7 +160,11 @@ namespace MyBGList.Controllers
         public async Task <RestDTO<BoardGame[]>> Get(
             /*use the [FromQuery] attribute to tell the routing middleware that we want to get the input values from the query string*/
             [FromQuery] RequestDTO <BoardGameDTO> input) /*<BoardGameDTO> => specified the BoardGameDTO as a generic type parameter*/
-        { 
+        {
+            //_logger.LogInformation("get method started.");             //logging test
+            //_logger.LogInformation(50110, "Get method started.");             // Setting custom event IDs
+            _logger.LogInformation(CustomLogEvents.BoardGamesController_Get, "Get method started");  // using CustomLogEvents
+
             var query = _context.BoardGames.AsQueryable();
             if (!string.IsNullOrEmpty(input.FilterQuery))
                 query = query.Where(b => b.Name.Contains(input.FilterQuery));

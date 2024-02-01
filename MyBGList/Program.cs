@@ -4,8 +4,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyBGList.Models;
 using Microsoft.AspNetCore.Diagnostics;
+using MyBGList.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
+// Add Logging providers chapter 7 
+builder.Logging
+    .ClearProviders()
+    //.AddSimpleConsole(opts => //Configuring the providers to timestamp its log entries using the HH:mm: ss format and the UTC time zone
+    //{
+    //    opts.SingleLine = true;
+    //    opts.TimestampFormat = "HH:mm:ss";
+    //    opts.UseUtcTimestamp = true;
+    //})
+    .AddSimpleConsole()
+    .AddDebug();
+
 
 // Add services to the container.
 
@@ -151,7 +164,17 @@ app.MapGet("/error",
         {
             details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1";
             details.Status = StatusCodes.Status500InternalServerError;
+            
         }
+        ////implement our exception logging change request     
+        //app.Logger.LogError(
+        //    exceptionHandler?.Error,
+        //    "An unhandled exception occurred.");
+       
+        app.Logger.LogError(
+            CustomLogEvents.Error_Get,        //// using MyBGList.Constants; 
+            exceptionHandler?.Error,
+            "An unhandled exception occurred.");
         return Results.Problem(details);
 
     });
