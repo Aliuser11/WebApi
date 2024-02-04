@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using MyBGList.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using MyBGList.Constants;
+using Serilog;
+using Serilog.Sinks.MSSqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add Logging providers chapter 7 
@@ -18,7 +20,42 @@ builder.Logging
     //})
     .AddSimpleConsole()
     .AddDebug();
+// azure chapter 7
+//.AddApplicationInsights(/*telemetry => telemetry
+//    .ConnectionString = */builder
+//    .Configuration["Azure:ApplicationInsights:ConnectionString"],
+//    loggerOptions => { });
 
+builder.Host.UseSerilog((ctx, lc) => {
+    lc.MinimumLevel.Is(Serilog.Events.LogEventLevel.Warning); 
+    lc.MinimumLevel.Override( 
+        "MyBGList", Serilog.Events.LogEventLevel.Information);
+    lc.ReadFrom.Configuration(ctx.Configuration);
+    lc.WriteTo.MSSqlServer(
+        connectionString:
+            ctx.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new MSSqlServerSinkOptions
+        {
+            //configured the SQL Server sink to auto-create it in case it doesn't exist.
+            TableName = "LogEvents",
+            AutoCreateSqlTable = true
+        },
+        columnOptions: new ColumnOptions()
+        {
+            AdditionalColumns = new SqlColumn[]
+            {
+                new SqlColumn() 
+                {
+                    ColumnName = "SourceContext",
+                    PropertyName = "SourceContext",
+                    DataType = System.Data.SqlDbType.NVarChar
+                }
+            }
+        });
+        },
+        writeToProviders: true);
+/* writeToProviders : true => this option ensures that Serilog will pass the log events not only to its sinks, but
+also to the logging providers registered through the Microsoft.Extensions.Logging API -*/
 
 // Add services to the container.
 
@@ -149,8 +186,13 @@ app.MapGet("/error",
             System.Diagnostics.Activity.Current?.Id
             ?? context.TraceIdentifier;
 
+        details.Type =
+            "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+        details.Status = StatusCodes.Status500InternalServerError;
+
+
         /* 6.3.5 Exception Handling exercise */
-        if(exceptionHandler?.Error is NotImplementedException)
+       /* if (exceptionHandler?.Error is NotImplementedException)
         {
             details.Type = "https://tools.ietf.org/html/rfc7231#section-6.6.2";
             details.Status = StatusCodes.Status501NotImplemented;
@@ -166,6 +208,7 @@ app.MapGet("/error",
             details.Status = StatusCodes.Status500InternalServerError;
             
         }
+        */
         ////implement our exception logging change request     
         //app.Logger.LogError(
         //    exceptionHandler?.Error,
@@ -228,5 +271,3 @@ app.MapControllers()
     .RequireCors("AnyOrigin"); 
 
 app.Run();
-
-//195 crud 5 chapter;
