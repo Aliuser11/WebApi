@@ -164,6 +164,11 @@ namespace MyBGList.Controllers
             //_logger.LogInformation("get method started.");             //logging test
             //_logger.LogInformation(50110, "Get method started.");             // Setting custom event IDs
             _logger.LogInformation(CustomLogEvents.BoardGamesController_Get, "Get method started");  // using CustomLogEvents
+            //_logger.LogInformation(CustomLogEvents.BoardGamesController_Get, $"Get method started at {DateTime.Now:HH:mm}"); /*string interpolation: */
+            
+            /*the message template syntax allows us to use string-based placeholders instead of numeric ones, which definitely improves readability.*/
+            _logger.LogInformation(CustomLogEvents.BoardGamesController_Get,
+            "Get method started at {StartTime:HH:mm}.", DateTime.Now);
 
             var query = _context.BoardGames.AsQueryable();
             if (!string.IsNullOrEmpty(input.FilterQuery))

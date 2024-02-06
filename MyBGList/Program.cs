@@ -31,6 +31,16 @@ builder.Host.UseSerilog((ctx, lc) => {
     lc.MinimumLevel.Override( 
         "MyBGList", Serilog.Events.LogEventLevel.Information);
     lc.ReadFrom.Configuration(ctx.Configuration);
+    lc.Enrich.WithMachineName();
+    lc.Enrich.WithThreadId(); // Now the MachineName and ThreadId properties will be created automatically in all our log records.
+    lc.WriteTo.File("Logs/log.txt",
+        outputTemplate: 
+            "{Timestamp:HH:mm:ss} [{Level:u3}] " +
+            "[{MachineName} #{ThreadId}] " +
+            "{Message:lj}{NewLine}{Exception}",
+        rollingInterval: RollingInterval.Day);
+    /*The above settings will instruct the sink to create a log.txt file in the /Logs/
+folder (creating it if it doesn't exist) with a rolling interval of one day*/
     lc.WriteTo.MSSqlServer(
         connectionString:
             ctx.Configuration.GetConnectionString("DefaultConnection"),
@@ -271,3 +281,4 @@ app.MapControllers()
     .RequireCors("AnyOrigin"); 
 
 app.Run();
+//333
