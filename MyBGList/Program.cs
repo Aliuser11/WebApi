@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using MyBGList.Constants;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
+using Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add Logging providers chapter 7 
@@ -80,6 +81,17 @@ builder.Services.AddControllers(opts =>
         (x, y) => $"The value '{x}' is not valid for {y}.");
     opts.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(
         () => $"A value is required.");
+
+    // CACHE PROFILES from chapter 8
+    /*ControllerMiddleware’s configuration option that allows us to set up some predefined caching directives and then apply them using a convenient namebased reference, instead of having to repeat them.*/
+    opts.CacheProfiles.Add("NoCache",
+        new CacheProfile() { NoStore = true });
+    opts.CacheProfiles.Add("Any-60",
+        new CacheProfile()
+        {
+            Location = ResponseCacheLocation.Any,
+            Duration = 60
+        });
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -120,6 +132,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 /*builder.Services.Configure< ApiBehaviorOptions > (options =>
 options.SuppressModelStateInvalidFilter = true);*/
 
+
+//Response Caching Middleware
+builder.Services.AddResponseCaching(opts => //fine-tune the middleware’s caching strategies by changing its default settings
+    {
+        opts.MaximumBodySize = 32 * 1024 * 1024;
+        opts.SizeLimit = 50 * 1024 * 1024;
+    });
+
+//Setting up the in-memory cache
+builder.Services.AddMemoryCache(); //IMemoryCache interface
+//Distributed Caching
+builder.Services.AddDistributedSqlServerCache(opts =>
+{
+    opts.ConnectionString =
+        builder.Configuration.GetConnectionString("DefaultConnection");
+    opts.SchemaName = "dbo";
+    opts.TableName = "AppCache";
+});
 var app = builder.Build();
 
 
@@ -175,8 +205,32 @@ UseDeveloperExceptionPage key has been previously set to false in the appsetting
 
 app.UseHttpsRedirection();
 app.UseCors(); //Applying CORS
+
+/*The Response Caching Middleware will only cache HTTP responses using
+GET or HEAD methods and resulting in a 200 - OK status code: any other
+responses, including error pages, will be ignored.*/
+app.UseResponseCaching(); //CORS Middleware must be called after the Response Caching Middleware in order to work
 app.UseAuthorization();
 
+//Implementing a no-cache default behavior | implementing custom middleware.
+/*app.Use((context, next) =>
+{
+    context.Response.Headers["cache-control"] =
+        "no-cache, no-store";
+    return next.Invoke();
+});*/ // that is literal approach, so it is vulnerable to human error risk of mistyping them, below strongly-typed values instead
+
+// implementing custom middleware using strongly-typed values
+app.Use((context, next) =>
+{
+    context.Response.GetTypedHeaders().CacheControl =
+        new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+        {
+            NoCache = true,
+            NoStore = true
+        };
+    return next.Invoke();
+});
 
 
 /*MINIMAL  A P I   */
@@ -277,8 +331,27 @@ app.MapGet("/cod/test",
 //    }
 //});
 
+//Manually setting the cache-control header
+app.MapGet("/cache/test/1",
+    [EnableCors("AnyOrigin")]
+    (HttpContext context) =>
+    {
+        context.Response.Headers["cache-control"] =
+            "no-cache, no-store";
+        return Results.Ok();
+    });
+
+//Manually setting the cache-control header
+app.MapGet("cache/test/2",//ccaching test method without specifying any caching strategy
+[EnableCors("AnyOrigin")]
+(HttpContext context) =>
+{
+    return Results.Ok();
+});
+
 app.MapControllers()
     .RequireCors("AnyOrigin"); 
 
 app.Run();
-//333
+
+//

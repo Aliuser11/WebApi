@@ -4,6 +4,8 @@ using MyBGList.DTO;
 using MyBGList.Models;
 using System.Linq.Dynamic.Core;
 using MyBGList.Constants;
+using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json;
 
 namespace MyBGList.Controllers
 {
@@ -15,13 +17,17 @@ namespace MyBGList.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<BoardGamesController> _logger;
 
+
         public BoardGamesController(
             ILogger<BoardGamesController> logger,
-            ApplicationDbContext context)
+            ApplicationDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
             _logger = logger;
+            _memoryCache = memoryCache;
         }
+
+        private readonly IMemoryCache _memoryCache;  //Injecting the IMemoryCache interface
 
         //[HttpGet(Name = "GetBoardGames")]
         //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
@@ -156,7 +162,9 @@ namespace MyBGList.Controllers
 
         /* from chapter 6 : Now that we have the RequestDTO class, we can use it to replace the simple type parameters of the BoardGamesController's Get method */
         [HttpGet(Name = "GetBoardGames")]
-        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
+      
+        [ResponseCache(CacheProfileName = "Any-60")] // cache profiles from chapter 8 implementation:
         public async Task <RestDTO<BoardGame[]>> Get(
             /*use the [FromQuery] attribute to tell the routing middleware that we want to get the input values from the query string*/
             [FromQuery] RequestDTO <BoardGameDTO> input) /*<BoardGameDTO> => specified the BoardGameDTO as a generic type parameter*/
@@ -164,23 +172,33 @@ namespace MyBGList.Controllers
             //_logger.LogInformation("get method started.");             //logging test
             //_logger.LogInformation(50110, "Get method started.");             // Setting custom event IDs
             _logger.LogInformation(CustomLogEvents.BoardGamesController_Get, "Get method started");  // using CustomLogEvents
-            //_logger.LogInformation(CustomLogEvents.BoardGamesController_Get, $"Get method started at {DateTime.Now:HH:mm}"); /*string interpolation: */
-            
-            /*the message template syntax allows us to use string-based placeholders instead of numeric ones, which definitely improves readability.*/
-            _logger.LogInformation(CustomLogEvents.BoardGamesController_Get,
-            "Get method started at {StartTime:HH:mm}.", DateTime.Now);
+                                                                                                     //_logger.LogInformation(CustomLogEvents.BoardGamesController_Get, $"Get method started at {DateTime.Now:HH:mm}"); /*string interpolation: */
 
-            var query = _context.BoardGames.AsQueryable();
-            if (!string.IsNullOrEmpty(input.FilterQuery))
-                query = query.Where(b => b.Name.Contains(input.FilterQuery));
-            query = query
-                    .OrderBy($"{input.SortColumn} {input.SortOrder}")
-                    .Skip(input.PageIndex * input.PageSize)
-                    .Take(input.PageSize);
+            /*the message template syntax allows us to use string-based placeholders instead of numeric ones, which definitely improves readability.*/
+            //_logger.LogInformation(CustomLogEvents.BoardGamesController_Get,
+            //"Get method started at {StartTime:HH:mm}.", DateTime.Now);
+
+            //Implementing an in-memory caching strategy
+            BoardGame[]? result = null;
+            var cacheKey =
+                $"{input.GetType()} - {JsonSerializer.Serialize(input)}";
+            if (!_memoryCache.TryGetValue<BoardGame[]>(cacheKey, out result))
+            {
+                var query = _context.BoardGames.AsQueryable();
+                if (!string.IsNullOrEmpty(input.FilterQuery))
+                    query = query.Where(b => b.Name.Contains(input.FilterQuery));
+                query = query
+                        .OrderBy($"{input.SortColumn} {input.SortOrder}")
+                        .Skip(input.PageIndex * input.PageSize)
+                        .Take(input.PageSize);
+                result = await query.ToArrayAsync();
+                _memoryCache.Set(cacheKey, result, new TimeSpan(0, 0, 30));
+            }           
 
             return new RestDTO<BoardGame[]>()
             {
-                Data = await query.ToArrayAsync(),
+                //Data = await query.ToArrayAsync(),
+                Data = result, // from chapter 8 that is
                 PageIndex = input.PageIndex, //Add the pageIndex and pageSize input parameters,
                 PageSize = input.PageSize,
                 RecordCount = await _context.BoardGames.CountAsync(), //Calculate the RecordCount
