@@ -16,7 +16,7 @@ namespace MyBGList.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<BoardGamesController> _logger;
-
+        private readonly IMemoryCache _memoryCache;  //Injecting the IMemoryCache interface
 
         public BoardGamesController(
             ILogger<BoardGamesController> logger,
@@ -27,7 +27,6 @@ namespace MyBGList.Controllers
             _memoryCache = memoryCache;
         }
 
-        private readonly IMemoryCache _memoryCache;  //Injecting the IMemoryCache interface
 
         //[HttpGet(Name = "GetBoardGames")]
         //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
@@ -165,6 +164,7 @@ namespace MyBGList.Controllers
         //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = 60)] //set up a public cache with a max-age of 60 seconds for that cache  response
       
         [ResponseCache(CacheProfileName = "Any-60")] // cache profiles from chapter 8 implementation:
+        //[ResponseCache(CacheProfileName = "Client-120")] //=> 8.5.2 exercise cache profile 
         public async Task <RestDTO<BoardGame[]>> Get(
             /*use the [FromQuery] attribute to tell the routing middleware that we want to get the input values from the query string*/
             [FromQuery] RequestDTO <BoardGameDTO> input) /*<BoardGameDTO> => specified the BoardGameDTO as a generic type parameter*/
@@ -193,7 +193,7 @@ namespace MyBGList.Controllers
                         .Take(input.PageSize);
                 result = await query.ToArrayAsync();
                 _memoryCache.Set(cacheKey, result, new TimeSpan(0, 0, 30));
-            }           
+            }
 
             return new RestDTO<BoardGame[]>()
             {
@@ -211,9 +211,43 @@ namespace MyBGList.Controllers
                         "GET"),
                 }
             };
+
+            // 8.5.4 in memory caching Record Count property
+            /* recordCount from RestDRO object */
+            /*(int recordCount, BoardGame[]? result) dataTuple = (0, null); //*
+            var cacheKey = $"{input.GetType()} - {JsonSerializer.Serialize(input)}";
+            if (!_memoryCache.TryGetValue(cacheKey, out dataTuple))  //*
+            {
+                var query = _context.BoardGames.AsQueryable();
+                if (!string.IsNullOrEmpty(input.FilterQuery))
+                {
+                    query = query.Where(b => b.Name.Contains(input.FilterQuery));
+                }
+                dataTuple.recordCount = await query.CountAsync();//*
+                query = query.
+                        OrderBy($"{input.SortColumn} {input.SortOrder}")
+                        .Skip(input.PageIndex * input.PageSize)
+                        .Take(input.PageSize);
+                dataTuple.result = await query.ToArrayAsync();//*
+                _memoryCache.Set(cacheKey, dataTuple, new TimeSpan(0, 0, 120));//*
+            }
+            return new RestDTO<BoardGame[]>()
+            {
+                Data = dataTuple.result, //*
+                PageIndex = input.PageIndex,
+                PageSize = input.PageSize,
+                RecordCount = dataTuple.recordCount,//*
+                Links = new List<LinkDTO> {
+                    new LinkDTO(
+                        Url.Action(null, "BoardGames", new {input.PageIndex, input.PageSize },
+                        Request.Scheme)!,
+                        "self",
+                        "GET"),
+                }
+            };*/
         }
 
-        /* POST method */ 
+        /* POST method */
         [HttpPost(Name = "UpdateBoardGame")]
         [ResponseCache(NoStore =true)]
         public async Task<RestDTO<BoardGame?>> Post(BoardGameDTO model)

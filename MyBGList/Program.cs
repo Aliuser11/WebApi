@@ -92,6 +92,14 @@ builder.Services.AddControllers(opts =>
             Location = ResponseCacheLocation.Any,
             Duration = 60
         });
+
+    /* 8.5.1 response caching: private and must expire after 120 sec.*/
+    opts.CacheProfiles.Add("Client-120",
+        new CacheProfile()
+        {
+            Location = ResponseCacheLocation.Client,
+            Duration = 120
+        });
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -133,15 +141,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.SuppressModelStateInvalidFilter = true);*/
 
 
-//Response Caching Middleware
+//Response Caching Middleware | settings
 builder.Services.AddResponseCaching(opts => //fine-tune the middleware’s caching strategies by changing its default settings
     {
         opts.MaximumBodySize = 32 * 1024 * 1024;
         opts.SizeLimit = 50 * 1024 * 1024;
+
+        // server-side response caching exercise 8.5.3
+        /*opts.MaximumBodySize = 128 * 1024 * 1024; //128mb
+        opts.SizeLimit = 200 * 1024 * 1024; // 200mb
+        opts.UseCaseSensitivePaths = true;*/ //sensitive
     });
 
 //Setting up the in-memory cache
 builder.Services.AddMemoryCache(); //IMemoryCache interface
+
 //Distributed Caching
 builder.Services.AddDistributedSqlServerCache(opts =>
 {
@@ -149,6 +163,7 @@ builder.Services.AddDistributedSqlServerCache(opts =>
         builder.Configuration.GetConnectionString("DefaultConnection");
     opts.SchemaName = "dbo";
     opts.TableName = "AppCache";
+    //opts.TableName = "SQLCache";// 8.5.5. disturbed caching name SQLCAche
 });
 var app = builder.Build();
 

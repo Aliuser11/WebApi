@@ -2,3 +2,6 @@ dotnet ef
 dotnet ef migrations add Initial
 dotnet ef database update Initial
 dotnet ef migrations remove -f
+
+<create table sql>
+dotnet sql-cache create "{connectionString}" dbo TableName
