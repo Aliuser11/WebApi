@@ -37,7 +37,7 @@ namespace MyBGList.Controllers
             Mechanic[]? result = null; // => Injecting the IDistributedCache interface
             var cacheKey =
                 $"{input.GetType()}-{JsonSerializer.Serialize(input)}";
-            if (!_distributedCache.TryGetValue<Mechanic[]>(cacheKey, out result);
+            if (!_distributedCache.TryGetValue<Mechanic[]>(cacheKey, out result));
             {
                 var query = _context.Mechanics.AsQueryable();
                 if (!string.IsNullOrEmpty(input.FilterQuery))

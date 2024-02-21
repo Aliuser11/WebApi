@@ -1,0 +1,5 @@
+
+Adding and applying a new migration
+
+dotnet ef migrations add Identity
+dotnet ef database update Identity

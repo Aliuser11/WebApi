@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MyBGList.Models
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApiUser> //9 Updating the ApplicationDbContext;
     {
         public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
@@ -81,5 +82,7 @@ namespace MyBGList.Models
         public DbSet<BoardGames_Domains> BoardGames_Domains => Set<BoardGames_Domains>();
         public DbSet<BoardGames_Mechanics> BoardGames_Mechanics => Set <BoardGames_Mechanics>();
         //public DbSet<BoardGames_Categories> BoardGames_Categories => Set <BoardGames_Categories>(); //bSets for the Category and the BoardGames_Categories enties in the ApplicationDbContext class using Fluent API.
+       
     }
+    
 }

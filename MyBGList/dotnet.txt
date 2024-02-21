@@ -5,3 +5,8 @@ dotnet ef migrations remove -f
 
 <create table sql>
 dotnet sql-cache create "{connectionString}" dbo TableName
+
+
+Adding and applying a new migration
+dotnet ef migrations add Identity
+dotnet ef database update Identity
