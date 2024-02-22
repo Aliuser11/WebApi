@@ -8,6 +8,10 @@ using MyBGList.Constants;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using Azure;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add Logging providers chapter 7 
@@ -140,6 +144,40 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 /*builder.Services.Configure< ApiBehaviorOptions > (options =>
 options.SuppressModelStateInvalidFilter = true);*/
 
+builder.Services.AddIdentity<ApiUser, IdentityRole> (opts =>
+{ //Adding the Identity service
+    opts.Password.RequireDigit = true; 
+    opts.Password.RequireUppercase = true;
+    opts.Password.RequireLowercase = true;
+    opts.Password.RequireNonAlphanumeric = true;
+    opts.Password.RequiredLength = 12;
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
+builder.Services.AddAuthentication(opts =>
+{ //Adding the Authentication service
+    opts.DefaultAuthenticateScheme =
+    opts.DefaultChallengeScheme =
+    opts.DefaultForbidScheme =
+    opts.DefaultScheme =
+    opts.DefaultSignInScheme =
+    opts.DefaultSignOutScheme =
+        JwtBearerDefaults.AuthenticationScheme; 
+}).AddJwtBearer(opts =>
+{
+    opts.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            System.Text.Encoding.UTF8.GetBytes(
+                builder.Configuration["JWT:SigningKey"]))
+    };
+});
 
 //Response Caching Middleware | settings
 builder.Services.AddResponseCaching(opts => //fine-tune the middleware’s caching strategies by changing its default settings
@@ -225,6 +263,8 @@ app.UseCors(); //Applying CORS
 GET or HEAD methods and resulting in a 200 - OK status code: any other
 responses, including error pages, will be ignored.*/
 app.UseResponseCaching(); //CORS Middleware must be called after the Response Caching Middleware in order to work
+
+app.UseAuthentication(); //chapter 9 Adding the Authentication middleware
 app.UseAuthorization();
 
 //Implementing a no-cache default behavior | implementing custom middleware.
@@ -369,4 +409,4 @@ app.MapControllers()
 
 app.Run();
 
-//
+//9.2.6 Implementing the AccountController 398
