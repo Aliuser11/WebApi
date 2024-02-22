@@ -409,4 +409,5 @@ app.MapControllers()
 
 app.Run();
 
-//9.2.6 Implementing the AccountController 398
+//9.2.6 Implementing the AccountController 404
+//9.3 Authorization settings 411 
