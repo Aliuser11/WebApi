@@ -5,7 +5,7 @@ namespace MyBGList.DTO
     public class RegisterDTO
     {
         [Required]
-        public string? UserNAme { get; set; }
+        public string? UserName { get; set; }
 
         [Required]
         [EmailAddress]

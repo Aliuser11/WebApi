@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add Logging providers chapter 7 
@@ -115,6 +117,31 @@ builder.Services.AddSwaggerGen(opts =>
 
     opts.ResolveConflictingActions(apiDesc => apiDesc.First());/*basically telling Swagger to resolve all conflicts related
 to duplicate routing handlers by always taking the first one found (and ignoring the others).*/
+   
+    opts.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {// chapter 9 Updating Swagger configuration
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    opts.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            //Array.Empty<string>()
+            new string[]{ }
+        }
+    });
 });
 
 
@@ -169,13 +196,15 @@ builder.Services.AddAuthentication(opts =>
     opts.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
+        RequireExpirationTime = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(
-                builder.Configuration["JWT:SigningKey"]))
+          System.Text.Encoding.UTF8.GetBytes(
+              builder.Configuration["JWT:SigningKey"])
+        )
     };
 });
 
@@ -398,11 +427,19 @@ app.MapGet("/cache/test/1",
 
 //Manually setting the cache-control header
 app.MapGet("cache/test/2",//ccaching test method without specifying any caching strategy
-[EnableCors("AnyOrigin")]
-(HttpContext context) =>
-{
-    return Results.Ok();
-});
+    [EnableCors("AnyOrigin")]
+    (HttpContext context) =>
+    {
+        return Results.Ok();
+    });
+
+app.MapGet("/auth/test/1",
+    [Authorize] // chapter 9 Minimal API Authorization
+    [EnableCors("AnyOrigin")]
+    [ResponseCache(NoStore = true)] () =>
+    {
+        return Results.Ok("You are authorized!");
+    });
 
 app.MapControllers()
     .RequireCors("AnyOrigin"); 

@@ -7,33 +7,37 @@ using System.Linq.Dynamic.Core;
 using System.ComponentModel.DataAnnotations;
 using MyBGList.Attributes;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Identity; 
-using Microsoft.IdentityModel.Tokens; 
-using System.IdentityModel.Tokens.Jwt; 
-using System.Security.Claims; 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace MyBGList.Controllers
 {
-    [Route("[controller] / [action]")]
+    [Route("[controller]/[action]")]
     [ApiController]
-
     public class AccountController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+
         private readonly ILogger<DomainsController> _logger;
-        private readonly IConfiguration _config;
+
+        private readonly IConfiguration _configuration;
+
         private readonly UserManager<ApiUser> _userManager;
+
         private readonly SignInManager<ApiUser> _signInManager;
 
         public AccountController(
             ApplicationDbContext context,
             ILogger<DomainsController> logger,
-            IConfiguration _config,
+            IConfiguration configuration,
             UserManager<ApiUser> userManager,
             SignInManager<ApiUser> signInManager)
         {
             _context = context;
             _logger = logger;
+            _configuration = configuration;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -47,7 +51,7 @@ namespace MyBGList.Controllers
                 if (ModelState.IsValid)
                 {
                     var newUser = new ApiUser();
-                    newUser.UserName = input.UserNAme;
+                    newUser.UserName = input.UserName;
                     newUser.Email = input.Email;
                     var result = await _userManager.CreateAsync(
                         newUser, input.Password);
@@ -55,20 +59,20 @@ namespace MyBGList.Controllers
                     {
                         _logger.LogInformation(
                             "User {userName} ({email}) has been created.",
-                            newUser.UserName, newUser.Email);
+                        newUser.UserName, newUser.Email);
                         return StatusCode(201,
-                            $"User ‘{newUser.UserName}’ has been created.");
+                            $"User '{newUser.UserName}' has been created.");
                     }
                     else
                         throw new Exception(
                             string.Format("Error: {0}", string.Join(" ",
-                            result.Errors.Select(e => e.Description))));
+                                result.Errors.Select(e => e.Description))));
                 }
                 else
                 {
                     var details = new ValidationProblemDetails(ModelState);
                     details.Type =
-                        "https://tools.ietf.org/html/rfc7231#section-6.5.1";
+                            "https://tools.ietf.org/html/rfc7231#section-6.5.1";
                     details.Status = StatusCodes.Status400BadRequest;
                     return new BadRequestObjectResult(details);
                 }
@@ -78,15 +82,14 @@ namespace MyBGList.Controllers
                 var exceptionDetails = new ProblemDetails();
                 exceptionDetails.Detail = e.Message;
                 exceptionDetails.Status =
-                StatusCodes.Status500InternalServerError;
+                    StatusCodes.Status500InternalServerError;
                 exceptionDetails.Type =
-                "https://tools.ietf.org/html/rfc7231#section-6.6.1";
+                        "https://tools.ietf.org/html/rfc7231#section-6.6.1";
                 return StatusCode(
-                StatusCodes.Status500InternalServerError,
-                exceptionDetails);
-            }  
+                    StatusCodes.Status500InternalServerError,
+                    exceptionDetails);
+            }
         }
-
 
         [HttpPost]
         [ResponseCache(CacheProfileName = "NoCache")]
@@ -94,32 +97,31 @@ namespace MyBGList.Controllers
         {
             try
             {
-                if(ModelState.IsValid)
+                if (ModelState.IsValid)
                 {
                     var user = await _userManager.FindByNameAsync(input.UserName);
                     if (user == null
                         || !await _userManager.CheckPasswordAsync(
                                 user, input.Password))
-                        throw new Exception("Invalis login attempt.");
-                
+                        throw new Exception("Invalid login attempt.");
                     else
                     {
                         var signingCredentials = new SigningCredentials(
                             new SymmetricSecurityKey(
                                 System.Text.Encoding.UTF8.GetBytes(
-                                    _config["JWT:SigningKey"])),
+                                    _configuration["JWT:SigningKey"])),
                             SecurityAlgorithms.HmacSha256);
 
                         var claims = new List<Claim>();
                         claims.Add(new Claim(
                             ClaimTypes.Name, user.UserName));
-                        //claims.AddRange(
-                        //(await _userManager.GetRolesAsync(user))
-                        //        .Select(r => new Claim(ClaimTypes.Role, r)));
+                        claims.AddRange(
+                            (await _userManager.GetRolesAsync(user))
+                                .Select(r => new Claim(ClaimTypes.Role, r)));
 
                         var jwtObject = new JwtSecurityToken(
-                            issuer: _config["JWT:Issuer"],
-                            audience: _config["JWT:Audience"],
+                            issuer: _configuration["JWT:Issuer"],
+                            audience: _configuration["JWT:Audience"],
                             claims: claims,
                             expires: DateTime.Now.AddSeconds(300),
                             signingCredentials: signingCredentials);
@@ -152,7 +154,7 @@ namespace MyBGList.Controllers
                 return StatusCode(
                     StatusCodes.Status401Unauthorized,
                     exceptionDetails);
-    }
-}
+            }
+        }
     }
 }

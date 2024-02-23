@@ -5,6 +5,7 @@ using MyBGList.DTO;
 using MyBGList.Models;
 using System.Diagnostics;
 using System.Linq.Dynamic.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyBGList.Controllers
 {
@@ -81,6 +82,7 @@ namespace MyBGList.Controllers
             };
         }
 
+        [Authorize]
         /* POST */
         [HttpPost(Name = "UpdateDomain")]
         [ResponseCache(NoStore = true)]
@@ -142,7 +144,7 @@ namespace MyBGList.Controllers
         }
 
         /* DELETE */
-
+        [Authorize]
         [HttpDelete(Name = "DeleteDomain")]
         [ResponseCache(NoStore = true)]
         public async Task<RestDTO<Domain?>> Delete(int id)
