@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add Logging providers chapter 7 
@@ -207,6 +208,26 @@ builder.Services.AddAuthentication(opts =>
         )
     };
 });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ModeratorWithMobilePhone", policy =>
+        policy
+            .RequireClaim(ClaimTypes.Role, RoleNames.Moderator) 
+            .RequireClaim(ClaimTypes.MobilePhone));
+
+    options.AddPolicy("MinAge18", policy =>
+        policy
+            .RequireAssertion(ctx =>
+                ctx.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth)
+                && DateTime.ParseExact(
+                    "yyyyMMdd",
+                    ctx.User.Claims.First(c =>
+                        c.Type == ClaimTypes.DateOfBirth).Value,
+                    System.Globalization.CultureInfo.InvariantCulture)
+                    >= DateTime.Now.AddYears(-18)));
+});
+
 
 //Response Caching Middleware | settings
 builder.Services.AddResponseCaching(opts => //fine-tune the middleware’s caching strategies by changing its default settings
@@ -441,10 +462,27 @@ app.MapGet("/auth/test/1",
         return Results.Ok("You are authorized!");
     });
 
+app.MapGet("/auth/test/2",
+    [Authorize(Roles = RoleNames.Moderator)]
+    [EnableCors("AnyOrigin")]
+    [ResponseCacheAttribute(NoStore = true)] () =>
+    {
+        return Results.Ok("Tou are authorized!");
+    });
+
+app.MapGet("/auth/test/3",
+    [Authorize(Roles = RoleNames.Administrator)]
+    [EnableCors("AnyOrigin")]
+    [ResponseCacheAttribute(NoStore = true)] () =>
+    {
+        return Results.Ok("You are authorized!");
+    });
+
+
+
 app.MapControllers()
     .RequireCors("AnyOrigin"); 
 
 app.Run();
 
-//9.2.6 Implementing the AccountController 404
-//9.3 Authorization settings 411 
+//

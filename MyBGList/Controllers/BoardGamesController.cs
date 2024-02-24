@@ -250,7 +250,7 @@ namespace MyBGList.Controllers
 
 
         /* POST method */
-        [Authorize]
+        [Authorize(Roles = RoleNames.Moderator)]
         [HttpPost(Name = "UpdateBoardGame")]
         [ResponseCache(NoStore =true)]
         public async Task<RestDTO<BoardGame?>> Post(BoardGameDTO model)
@@ -313,7 +313,7 @@ namespace MyBGList.Controllers
         }
 
         /*DELETE METHOD*/
-        [Authorize]
+        [Authorize(Roles = RoleNames.Administrator)]
         [HttpDelete(Name = "DeleteBoardGame")]
         [ResponseCache(NoStore = true)]
         public async Task<RestDTO<BoardGame?>> Delete(int id)

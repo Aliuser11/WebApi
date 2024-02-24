@@ -110,11 +110,11 @@ namespace MyBGList.Controllers
                             new SymmetricSecurityKey(
                                 System.Text.Encoding.UTF8.GetBytes(
                                     _configuration["JWT:SigningKey"])),
-                            SecurityAlgorithms.HmacSha256);
+                            SecurityAlgorithms.Aes128CbcHmacSha256); //HmacSha256
 
                         var claims = new List<Claim>();
                         claims.Add(new Claim(
-                            ClaimTypes.Name, user.UserName));
+                            ClaimTypes.Name, user.UserName)); //Adding role-based claims to JWT
                         claims.AddRange(
                             (await _userManager.GetRolesAsync(user))
                                 .Select(r => new Claim(ClaimTypes.Role, r)));
