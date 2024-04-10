@@ -298,7 +298,16 @@ namespace MyBGList.Controllers
                 rolesCreated++;
             }
 
-
+            //ensure that the new role will be created if it doesn’t already exist. 9.5.1 Add a new Role
+            /*var testModerator = await _userManager
+                .FindByNameAsync("TestModerator");
+            if (testModerator != null
+                && !await _userManager.IsInRoleAsync(
+                    testModerator, RoleNames.Moderator))
+            {
+                await _userManager.AddToRoleAsync(testModerator, RoleNames.Moderator);
+                usersAddedToRoles++;
+            }*/
 
             var testAdministrator = await _userManager
                 .FindByNameAsync("TestAdministrator");
@@ -313,7 +322,23 @@ namespace MyBGList.Controllers
 
                 usersAddedToRoles++;
             }
-            
+
+            // 9.5.3. assign TestSuperAdmin
+            /*var testSuperAdmin = await _userManager
+                .FindByNameAsync("TestSuperAdmin");
+            if (testSuperAdmin != null
+                && !await _userManager.IsInRoleAsync(
+                    testSuperAdmin , RoleNames.SuperAdmin))
+            {
+                await _userManager.AddToRoleAsync(
+                    testSuperAdmin, RoleNames.Moderator);
+                await _userManager.AddToRoleAsync(
+                    testSuperAdmin, RoleNames.Administrator);
+                await _userManager.AddToRoleAsync(
+                    testSuperAdmin, RoleNames.SuperAdmin);
+                usersAddedToRoles++;
+            }
+            */
             return new JsonResult(new
             {
                 RolesCreated = rolesCreated,
