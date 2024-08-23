@@ -478,7 +478,13 @@ app.MapGet("/auth/test/3",
         return Results.Ok("You are authorized!");
     });
 
-
+app.MapGet("/auth/test/4", //9.5.4 Implement a test endpoint
+    [Authorize(Roles = RoleNames.SuperAdmin)]
+    [EnableCors("AnyOrigin")]
+    [ResponseCacheAttribute(NoStore = true)] () =>
+    {
+        return Results.Ok("You are authorized!");
+    });
 
 app.MapControllers()
     .RequireCors("AnyOrigin"); 
